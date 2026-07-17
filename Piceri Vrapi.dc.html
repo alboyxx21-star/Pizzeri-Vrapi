@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<script src="image-slot.js"></script>
+<style>
+  html,body{margin:0;padding:0;background:#0D0C0A}
+  body{font-family:'Outfit',sans-serif;color:#F2EAD9}
+  a{color:#F2EAD9;text-decoration:none;transition:color .25s ease}
+  a:hover{color:#E23B2E}
+  ::selection{background:#E23B2E;color:#fff}
+  /* ---- section bands: alternating shades so every section reads as its own block ---- */
+  /* light theme default: dark ink on light bands */
+  h1,h2,h3,h4,h5,h6,p,a,span{
+    color:#1C1712 !important;
+  }
+  body{
+    background-color:#FFFFFF !important;
+  }
+  /* light bands alternate white / warm paper, split by hairlines */
+  #about{background-color:#FFFFFF !important}
+  #gallery{background-color:#F7F0E3 !important}
+  #reviews{background-color:#FFFFFF !important}
+  #location{background-color:#F7F0E3 !important}
+  #gallery, #reviews, #location{border-top:1px solid rgba(28,23,18,.08) !important}
+  /* softer long-form copy + muted small labels on light bands */
+  #about p{color:rgba(28,23,18,.78) !important}
+  #about span[style*="242,234,217"], #gallery span[style*="242,234,217"], #location span[style*="242,234,217"],
+  #about span[style*="242, 234, 217"], #gallery span[style*="242, 234, 217"], #location span[style*="242, 234, 217"]{color:rgba(28,23,18,.55) !important}
+  #about span[data-count]{color:var(--accent,#E23B2E) !important}
+  #location div[style*="242,234,217"], #location div[style*="242, 234, 217"]{color:rgba(28,23,18,.8) !important}
+  #location a[href^="tel"]{color:var(--accent,#E23B2E) !important}
+  /* review cards restyled for the light band */
+  #reviews figure{border-color:rgba(28,23,18,.12) !important; background:#FAF4E8 !important}
+  #reviews blockquote{color:#1C1712 !important}
+  #reviews figcaption{color:rgba(28,23,18,.55) !important}
+  /* menu (flip-book) sits on a dark band — keep its heading light */
+  #menu-open h2{color:#F2EAD9 !important}
+  /* pizza showcase stays a dark band between the light ones */
+  #showcase{background-color:#0D0C0A !important}
+  #showcase h3{color:#F2EAD9 !important}
+  #showcase p{color:rgba(242,234,217,.75) !important}
+  #showcase span{color:#F2EAD9 !important}
+  #showcase span[style*="242,234,217"], #showcase span[style*="242, 234, 217"]{color:rgba(242,234,217,.55) !important}
+  /* nav + hero sit over dark imagery — keep their text white */
+  #vrapi-nav a, #vrapi-nav span,
+  #hero h1, #hero p, #hero a, #hero span{
+    color: #F2EAD9 !important;
+  }
+  #vrapi-nav a:hover, #vrapi-nav nav a:hover{
+    color: #E23B2E !important;
+  }
+  #hero h1 em{
+    color: var(--accent, #E23B2E) !important;
+  }
+  /* 3D flip-book menu */
+  .vrapi-hs{position:absolute; cursor:pointer; border-radius:8px; transition:background .2s ease}
+  .vrapi-hs:hover{background:rgba(232,138,26,.16); outline:2px solid rgba(232,138,26,.75); outline-offset:-2px}
+  #vrapi-flip-row{display:flex; align-items:center; justify-content:center; gap:16px; width:100%}
+  #menu-open .vrapi-cap span{color:rgba(242,234,217,.65) !important}
+  #menu-open .vrapi-cap span.acc{color:var(--accent, #E23B2E) !important}
+  @media (max-width:680px){
+    #vrapi-flip-row{flex-wrap:wrap; row-gap:12px}
+    #vrapi-flipbook{order:1; height:min(58vh,56vw) !important}
+    #vrapi-prev{order:2}
+    #vrapi-next{order:3}
+  }
+  /* premium footer */
+  #vrapi-footer{background:#0B0B0B !important; border-top:1px solid rgba(255,255,255,.08); font-family:'Outfit',sans-serif}
+  #vrapi-footer .vr-grid{max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:clamp(32px,5vw,72px)}
+  #vrapi-footer h4{font-family:'Poppins','Outfit',sans-serif; font-weight:700; font-size:14px; letter-spacing:.22em; text-transform:uppercase; margin:0 0 20px; color:#fff !important}
+  #vrapi-footer h4::after{content:''; display:block; width:28px; height:2px; background:#D62828; margin-top:9px}
+  #vrapi-footer p{color:rgba(255,255,255,.6) !important}
+  #vrapi-footer a{color:rgba(255,255,255,.6) !important; font-size:15px; transition:color .25s ease, transform .25s ease, background .25s ease, border-color .25s ease}
+  #vrapi-footer a:hover{color:#F4A300 !important}
+  #vrapi-footer .vr-brand{color:#fff !important; font-family:'Poppins','Outfit',sans-serif; font-weight:700; font-size:19px; letter-spacing:.14em}
+  #vrapi-footer .vr-mut{color:rgba(255,255,255,.6) !important; font-size:15px}
+  #vrapi-footer .vr-gold{color:#F4A300 !important; font-size:15px; font-weight:600}
+  #vrapi-footer .vr-bar{max-width:1200px; margin:clamp(36px,5vw,60px) auto 0; padding:22px 0; border-top:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+  #vrapi-footer .vr-bar span{color:rgba(255,255,255,.45) !important; font-size:13px; letter-spacing:.04em}
+  #vrapi-footer a.vr-soc{width:42px; height:42px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); display:grid; place-items:center; color:rgba(255,255,255,.75) !important}
+  #vrapi-footer a.vr-soc svg{width:20px; height:20px; fill:currentColor; display:block}
+  #vrapi-footer a.vr-soc:hover{color:#fff !important; border-color:transparent; transform:translateY(-2px)}
+  #vrapi-footer a.vr-ig:hover{background:linear-gradient(45deg,#F09433 0%,#E6683C 25%,#DC2743 50%,#CC2366 75%,#BC1888 100%)}
+  #vrapi-footer a.vr-fb:hover{background:#1877F2}
+  #vrapi-footer a.vr-wa:hover{background:#25D366}
+  @media (max-width:820px){
+    #vrapi-footer .vr-grid{grid-template-columns:1fr; gap:40px}
+  }
+  /* ===================== RESPONSIVE (phones → tablets → desktop) ===================== */
+  *{ -webkit-tap-highlight-color:rgba(226,59,46,.15) }
+  img,video{ max-width:100% }
+  /* mobile hamburger nav — hidden on desktop */
+  .vr-nav-cb{ display:none }
+  .vr-burger{ display:none }
+  .vr-mobile-menu{ display:none }
+  .vr-burger{ position:relative; z-index:60; width:46px; height:46px; margin-left:auto; border-radius:12px; border:1px solid rgba(242,234,217,.25); background:rgba(13,12,10,.4); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); cursor:pointer; flex-direction:column; align-items:center; justify-content:center; gap:5px; box-sizing:border-box }
+  .vr-burger span{ display:block; width:20px; height:2px; background:#F2EAD9; border-radius:2px; transition:transform .3s ease, opacity .2s ease }
+  /* burger → X (checkbox lives outside the header, so match via the common ancestor) */
+  #vrapi-root:has(.vr-nav-cb:checked) .vr-burger span:nth-child(1){ transform:translateY(7px) rotate(45deg) }
+  #vrapi-root:has(.vr-nav-cb:checked) .vr-burger span:nth-child(2){ opacity:0 }
+  #vrapi-root:has(.vr-nav-cb:checked) .vr-burger span:nth-child(3){ transform:translateY(-7px) rotate(-45deg) }
+  .vr-mobile-menu{ position:fixed; inset:0; z-index:-1; flex-direction:column; align-items:center; justify-content:center; gap:26px; background:rgba(11,10,8,.98); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease }
+  .vr-mobile-menu a{ color:#F2EAD9 !important; font-size:24px; font-weight:500; letter-spacing:.12em }
+  .vr-mobile-menu a:hover{ color:#E23B2E !important }
+  .vr-nav-cb:checked ~ .vr-mobile-menu{ opacity:1; visibility:visible; z-index:45 }
+
+  /* ---- tablet & down (≤900px) ---- */
+  @media (max-width:900px){
+    #vrapi-nav-inner > nav{ display:none !important }
+    .vr-burger{ display:flex }
+    .vr-mobile-menu{ display:flex }
+    #vrapi-nav-inner{ padding:18px 22px !important }
+    /* single / reduced column grids */
+    #about > div{ grid-template-columns:1fr !important; gap:44px !important; max-width:620px !important }
+    #location > div{ grid-template-columns:1fr !important; gap:36px !important; max-width:620px !important }
+    #reviews > div > div:nth-of-type(2){ grid-template-columns:1fr 1fr !important }
+    /* trim oversized vertical rhythm */
+    #about{ padding:96px 26px !important }
+    #reviews{ padding:96px 26px !important }
+    #location{ padding:96px 26px 84px !important }
+  }
+
+  /* ---- phones (≤640px) ---- */
+  @media (max-width:640px){
+    #hero{ padding:118px 20px 72px !important }
+    [data-hero="title"]{ font-size:clamp(44px,13vw,76px) !important }
+    [data-hero="eyebrow"]{ font-size:10px !important; letter-spacing:.24em !important; flex-wrap:wrap; justify-content:center; gap:10px !important }
+    [data-hero="sub"]{ font-size:15.5px !important }
+    [data-hero="cta"]{ flex-wrap:wrap; justify-content:center; width:100% }
+    [data-hero="cta"] a{ flex:1 1 auto; text-align:center; min-width:150px }
+    /* showcase: stack wheel over caption, centered. Captions stay absolutely
+       stacked (inset:0 in a fixed-height box) so the GSAP crossfade keeps showing
+       the caption that matches the current pizza — never blank, never cut off. */
+    #showcase{ padding:11vh 0 9vh !important }
+    #showcase > div:first-child{ flex-direction:column-reverse !important; gap:20px !important; text-align:center; padding:0 22px !important }
+    #showcase > div:first-child > div:first-child{ max-width:none !important; width:100%; flex:0 0 auto !important; min-height:200px !important }
+    #showcase [data-pzcap]{ align-items:center !important }
+    #showcase [data-pzcap] p{ font-size:15px !important }
+    #vrapi-pizza-wheel{ width:min(62vw,300px) !important }
+    #showcase > div:nth-child(2){ top:4vh !important; padding:0 20px }
+    #showcase > div:nth-child(2) span{ font-size:11px !important; letter-spacing:.26em !important }
+    #vrapi-showcase-arrow{ display:none !important }
+    /* reviews → single column */
+    #reviews > div > div:nth-of-type(2){ grid-template-columns:1fr !important }
+    #reviews figure{ padding:26px !important }
+    /* tighter section padding */
+    #about{ padding:76px 20px !important }
+    #reviews{ padding:76px 20px !important }
+    #location{ padding:76px 20px 68px !important }
+    #about > div{ gap:36px !important }
+    /* menu: flat single page on phones — no 3D transform, so it renders at full
+       device resolution (fixes the mobile blur) and is far more readable */
+    #vrapi-flipbook{ width:min(92vw,430px) !important; height:auto !important; aspect-ratio:1170 / 1560 !important; perspective:none !important }
+    #vrapi-flipbook > div[aria-hidden="true"]{ display:none !important }
+    #vrapi-flipbook [data-sheet]{ display:none !important }
+    #vrapi-mobile-page{ border-radius:12px; box-shadow:0 30px 70px rgba(0,0,0,.55) }
+    /* gallery heading */
+    #gallery{ padding:76px 0 44px !important }
+    /* footer: center columns */
+    #vrapi-footer{ padding:60px 22px 0 !important }
+    #vrapi-footer .vr-bar{ justify-content:center; text-align:center }
+  }
+
+  /* ---- small phones (≤380px: iPhone SE, older Galaxy) ---- */
+  @media (max-width:380px){
+    [data-hero="title"]{ font-size:clamp(40px,14vw,64px) !important }
+    #vrapi-nav-inner img{ width:42px !important; height:42px !important }
+    #vrapi-nav-inner span[style*="font-size:22px"]{ font-size:19px !important }
+    .vr-mobile-menu a{ font-size:21px }
+  }
+  /* ===== reviews slider (one review at a time, arrows + dots + swipe) ===== */
+  #vrapi-rev-track{will-change:transform}
+  .vr-rev-slide{flex:0 0 100%}
+  .vr-rev-name{color:rgba(28,23,18,.55) !important}
+  .vr-rev-arrow{position:absolute; top:42%; transform:translateY(-50%); width:46px; height:46px; border-radius:50%; border:1px solid rgba(28,23,18,.2); background:#fff; color:#1C1712 !important; font-size:22px; line-height:1; cursor:pointer; display:grid; place-items:center; z-index:3; transition:border-color .25s, color .25s}
+  .vr-rev-arrow:hover{border-color:var(--accent); color:var(--accent) !important}
+  #vrapi-rev-prev{left:-14px}
+  #vrapi-rev-next{right:-14px}
+  .vr-rev-dots{display:flex; gap:9px; justify-content:center; margin-top:24px}
+  .vr-rev-dot{width:9px; height:9px; padding:0; border:none; border-radius:50%; background:rgba(28,23,18,.22); cursor:pointer; transition:background .3s, width .3s}
+  .vr-rev-dot.active{background:var(--accent); width:26px; border-radius:5px}
+  .vr-rev-cta{display:inline-flex; align-items:center; gap:9px; margin-top:28px; padding:13px 26px; border-radius:999px; background:var(--accent); color:#fff !important; font-weight:600; font-size:14px; letter-spacing:.04em; transition:background .25s, transform .25s}
+  .vr-rev-cta:hover{background:#c22e22; color:#fff !important; transform:translateY(-2px)}
+  @media (max-width:640px){
+    .vr-rev-arrow{display:none}
+    #vrapi-rev-slider{max-width:none}
+  }
+  /* ===== loading screen (logo assembles, based on the brand animation) ===== */
+  #vrapi-loader{position:fixed; inset:0; z-index:9999; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; animation:vrapi-load-out .6s ease 2.5s forwards}
+  .vr-load-badge{position:relative; width:clamp(118px,30vw,172px); aspect-ratio:1/1; display:grid; place-items:center}
+  .vr-load-badge svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+  .vr-load-ring1{stroke-dasharray:289; stroke-dashoffset:0; animation:vrapi-ring1 1.1s ease .15s both}
+  .vr-load-ring2{stroke-dasharray:258; stroke-dashoffset:0; animation:vrapi-ring2 1.1s ease .35s both}
+  .vr-load-logo{width:72%; height:72%; border-radius:50%; object-fit:cover; opacity:1; will-change:transform,opacity,filter; animation:vrapi-load-pop .9s cubic-bezier(.34,1.56,.64,1) .1s both}
+  .vr-load-title{font-family:'Instrument Serif',serif; font-size:clamp(24px,5vw,34px); letter-spacing:.14em; color:#1C1712; opacity:1; animation:vrapi-load-up .7s ease .8s both}
+  .vr-load-tag{font-size:11px; letter-spacing:.42em; font-weight:600; color:#8C2B22; opacity:1; animation:vrapi-load-up .7s ease 1s both}
+  @keyframes vrapi-load-pop{0%{opacity:0; transform:scale(.3) rotate(-35deg); filter:blur(8px)} 60%{opacity:1; filter:blur(0)} 100%{opacity:1; transform:scale(1) rotate(0); filter:blur(0)}}
+  @keyframes vrapi-ring1{from{stroke-dashoffset:289} to{stroke-dashoffset:0}}
+  @keyframes vrapi-ring2{from{stroke-dashoffset:258} to{stroke-dashoffset:0}}
+  @keyframes vrapi-load-up{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)}}
+  @keyframes vrapi-load-out{to{opacity:0; visibility:hidden; pointer-events:none}}
+  /* ===== legal (privacy / cookies) links, modal, cookie banner ===== */
+  #vrapi-footer .vr-legal-links{display:flex; gap:18px; flex-wrap:wrap; justify-content:center}
+  #vrapi-footer .vr-legal-links a{cursor:pointer; font-size:13px; color:rgba(255,255,255,.55) !important; letter-spacing:.03em}
+  #vrapi-footer .vr-legal-links a:hover{color:#F4A300 !important}
+  .vr-legal-overlay{position:fixed; inset:0; z-index:9000; background:rgba(11,10,8,.72); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); display:grid; place-items:center; padding:20px; box-sizing:border-box}
+  .vr-legal-modal{position:relative; width:min(720px,94vw); max-height:86vh; overflow-y:auto; -webkit-overflow-scrolling:touch; background:#FBF6EC; color:#1C1712; border-radius:18px; padding:clamp(26px,4vw,44px); box-shadow:0 40px 100px rgba(0,0,0,.55)}
+  .vr-legal-modal h3{margin:0 0 4px; font-family:'Instrument Serif',serif !important; font-size:clamp(26px,4vw,36px); color:#1C1712 !important}
+  .vr-legal-updated{font-size:12px; letter-spacing:.06em; color:rgba(28,23,18,.5) !important; margin-bottom:22px}
+  .vr-legal-sec{margin-bottom:18px}
+  .vr-legal-sec h4{margin:0 0 6px; font-family:'Outfit',sans-serif !important; font-size:15px; font-weight:700; letter-spacing:.02em; color:#8C2B22 !important}
+  .vr-legal-sec p{margin:0; font-size:14.5px; line-height:1.7; color:rgba(28,23,18,.82) !important}
+  .vr-legal-close{position:absolute; top:14px; right:14px; width:38px; height:38px; border-radius:10px; border:none; background:var(--accent); color:#fff !important; font-size:16px; font-weight:800; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.3)}
+  .vr-legal-close:hover{background:#c22e22}
+  .vr-cookie{position:fixed; left:16px; right:16px; bottom:16px; z-index:200; max-width:760px; margin:0 auto; background:rgba(17,15,12,.96); border:1px solid rgba(242,234,217,.14); border-radius:14px; padding:16px 18px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:center; box-shadow:0 20px 50px rgba(0,0,0,.45); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px)}
+  .vr-cookie span{font-size:13px; line-height:1.5; color:rgba(242,234,217,.85) !important; flex:1 1 300px}
+  .vr-cookie a{cursor:pointer; font-size:13px; color:#F4A300 !important; font-weight:600; white-space:nowrap}
+  .vr-cookie button{flex:0 0 auto; padding:10px 24px; border-radius:999px; border:none; background:var(--accent); color:#fff !important; font-weight:600; font-size:13px; cursor:pointer; transition:background .25s}
+  .vr-cookie button:hover{background:#c22e22}
+  @media (max-width:560px){ .vr-cookie{flex-direction:column; text-align:center} }
+  @keyframes vrapi-spin{to{transform:rotate(360deg)}}
+  @keyframes vrapi-sway{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(3deg)}}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div id="vrapi-root" data-screen-label="Piceri Vrapi" style="--accent:#E23B2E; background:#0D0C0A; color:#F2EAD9; overflow:clip; position:relative; min-height:100vh">
+
+  <!-- loading screen: brand badge assembles, rings draw, name rises, then fades away -->
+  <div id="vrapi-loader" aria-hidden="true">
+    <div class="vr-load-badge">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="vr-load-ring1" cx="50" cy="50" r="46" fill="none" stroke="#1C1712" stroke-width="2" stroke-linecap="round" transform="rotate(-90 50 50)"></circle>
+        <circle class="vr-load-ring2" cx="50" cy="50" r="41" fill="none" stroke="#8C2B22" stroke-width="2" stroke-linecap="round" transform="rotate(-90 50 50)"></circle>
+      </svg>
+      <img class="vr-load-logo" src="uploads/logo.jpg" alt="Piceri Vrapi">
+    </div>
+    <div class="vr-load-title">PICERI VRAPI</div>
+    <div class="vr-load-tag">PICERI · FAST FOOD · EST 2014</div>
+  </div>
+
+  <!-- floating parallax decor -->
+  <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; z-index:0">
+    <div data-parallax="-18" data-sway="1" style="position:absolute; top:8%; left:-120px; width:420px; height:420px; border-radius:50%; background:radial-gradient(circle, rgba(226,59,46,.16), transparent 65%); filter:blur(10px); will-change:transform"></div>
+    <div data-parallax="-30" data-sway="1" style="position:absolute; top:52%; right:-140px; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, rgba(217,154,43,.12), transparent 65%); filter:blur(12px); will-change:transform"></div>
+    <div data-parallax="-12" data-sway="1" style="position:absolute; top:120%; left:6%; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle, rgba(78,122,70,.13), transparent 65%); filter:blur(10px); will-change:transform"></div>
+    <div data-parallax="-24" data-sway="1" style="position:absolute; top:24%; right:12%; width:180px; height:180px; border-radius:50%; border:1px solid rgba(242,234,217,.12); will-change:transform"></div>
+    <div data-parallax="-10" data-sway="1" style="position:absolute; top:150%; right:20%; width:120px; height:120px; border-radius:50%; border:1px solid rgba(226,59,46,.22); will-change:transform"></div>
+    <div data-parallax="-8" style="position:absolute; top:60%; left:4%; font-family:'Instrument Serif',serif; font-style:italic; font-size:340px; line-height:1; color:rgba(242,234,217,.035); will-change:transform">V</div>
+  </div>
+
+  <!-- navbar -->
+  <header id="vrapi-nav" style="position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(13,12,10,0); border-bottom:1px solid rgba(242,234,217,0); backdrop-filter:blur(0px); -webkit-backdrop-filter:blur(0px)">
+    <div id="vrapi-nav-inner" style="max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:16px; padding:22px 32px">
+      <a href="#hero" onClick="{{ navTo }}" style="display:flex; align-items:center; gap:14px">
+        <img src="uploads/logo.jpg" alt="Piceri Vrapi" style="width:48px; height:48px; border-radius:50%; object-fit:cover; background:#fff; border:1px solid rgba(242,234,217,.2)">
+        <span style="display:flex; flex-direction:column; line-height:1.1">
+          <span style="font-family:'Instrument Serif',serif; font-size:22px; letter-spacing:.08em">PICERI VRAPI</span>
+          <span style="font-size:11px; letter-spacing:.34em; color:rgba(242,234,217,.55); font-weight:500">PIZZA • HALLALL</span>
+        </span>
+      </a>
+      <nav style="margin-left:auto; display:flex; gap:32px; font-size:14px; font-weight:500; letter-spacing:.06em">
+        <a href="#about" onClick="{{ navTo }}">About</a>
+        <a href="#menu-open" onClick="{{ navTo }}">Menu</a>
+        <a href="#gallery" onClick="{{ navTo }}">Gallery</a>
+        <a href="#reviews" onClick="{{ navTo }}">Reviews</a>
+        <a href="#location" onClick="{{ navTo }}">Location</a>
+      </nav>
+      <!-- mobile hamburger label (toggles the checkbox that lives outside the header) -->
+      <label for="vrapi-nav-cb" class="vr-burger" aria-label="Hap/mbyll menunë">
+        <span></span><span></span><span></span>
+      </label>
+    </div>
+  </header>
+
+  <!-- mobile menu overlay — kept OUTSIDE the header so no transformed/filtered ancestor
+       confines its position:fixed (checkbox precedes it for the :checked ~ selector) -->
+  <input type="checkbox" id="vrapi-nav-cb" class="vr-nav-cb" aria-hidden="true">
+  <nav class="vr-mobile-menu">
+    <a href="#about" onClick="{{ navTo }}">About</a>
+    <a href="#menu-open" onClick="{{ navTo }}">Menu</a>
+    <a href="#gallery" onClick="{{ navTo }}">Gallery</a>
+    <a href="#reviews" onClick="{{ navTo }}">Reviews</a>
+    <a href="#location" onClick="{{ navTo }}">Location</a>
+  </nav>
+
+  <!-- hero -->
+  <section id="hero" data-screen-label="Hero" style="position:relative; z-index:1; min-height:100vh; display:grid; place-items:center; padding:140px 32px 80px; text-align:center; overflow:hidden">
+    <video id="vrapi-hero-video" src="uploads/hero-video.mp4" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; will-change:transform"></video>
+    <div style="position:absolute; inset:0; z-index:0; background:linear-gradient(rgba(13,12,10,.72), rgba(13,12,10,.55) 45%, #0D0C0A 96%)"></div>
+    <div id="vrapi-hero-content" style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:28px; max-width:980px">
+      <div data-hero="eyebrow" style="display:flex; align-items:center; gap:14px; font-size:12px; letter-spacing:.4em; font-weight:600; color:rgba(242,234,217,.6)">
+        <span style="width:40px; height:1px; background:rgba(226,59,46,.6)"></span>
+        PICERI • FAST FOOD • HALLALL — EST 2014
+        <span style="width:40px; height:1px; background:rgba(226,59,46,.6)"></span>
+      </div>
+      <h1 data-hero="title" style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(56px,9vw,124px); line-height:.98; letter-spacing:-.01em">
+        The Art of <em style="font-style:italic; color:var(--accent)">Flavor</em>
+      </h1>
+      <p data-hero="sub" style="margin:0; max-width:560px; font-size:17px; font-weight:300; line-height:1.7; color:rgba(242,234,217,.72)">
+        Pica të pjekura në furrë, burgera dhe fast food 100% hallall — të gatuara çdo ditë me përbërës të freskët në zemër të Tiranës.
+      </p>
+      <div data-hero="cta" style="display:flex; gap:16px; margin-top:6px">
+        <a href="#menu-open" onClick="{{ navTo }}" style="background:var(--accent); color:#fff; padding:15px 34px; border-radius:999px; font-weight:600; font-size:14px; letter-spacing:.08em" style-hover="background:#c22e22; color:#fff">SHIKO MENUNË</a>
+        <a href="#location" onClick="{{ navTo }}" style="border:1px solid rgba(242,234,217,.3); padding:15px 34px; border-radius:999px; font-weight:500; font-size:14px; letter-spacing:.08em" style-hover="border-color:#E23B2E; color:#E23B2E">NA VIZITONI</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- about -->
+  <section id="about" data-screen-label="About" style="position:relative; z-index:1; padding:130px 32px; border-top:1px solid rgba(242,234,217,.07)">
+    <div style="max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1.1fr .9fr; gap:70px; align-items:center">
+      <div style="display:flex; flex-direction:column; gap:22px">
+        <div style="font-size:12px; letter-spacing:.4em; font-weight:600; color:var(--accent)">RRETH NESH</div>
+        <h2 data-split="1" style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(36px,4.5vw,58px); line-height:1.08">Një furrë, një familje — shija e lagjes suaj</h2>
+        <p style="margin:0; font-size:16px; font-weight:300; line-height:1.8; color:rgba(242,234,217,.72)">
+          Që nga viti 2014, Piceri Vrapi u shërben lagjeve të Tiranës pica artizanale, burgera dhe fast food tërësisht hallall. Çdo brumë hapet në dorë, çdo mish zgjidhet me kujdes — sepse shija e vërtetë nuk nxitohet.
+        </p>
+        <div style="display:flex; gap:40px; margin-top:10px">
+          <div data-stat="1" style="display:flex; flex-direction:column; gap:4px">
+            <span data-count="10" data-suffix="+" style="font-family:'Instrument Serif',serif; font-size:40px; color:var(--accent)">10+</span>
+            <span style="font-size:13px; color:rgba(242,234,217,.55)">vite përvojë</span>
+          </div>
+          <div data-stat="1" style="display:flex; flex-direction:column; gap:4px">
+            <span data-count="100" data-suffix="%" style="font-family:'Instrument Serif',serif; font-size:40px; color:var(--accent)">100%</span>
+            <span style="font-size:13px; color:rgba(242,234,217,.55)">hallall</span>
+          </div>
+          <div data-stat="1" style="display:flex; flex-direction:column; gap:4px">
+            <span data-count="60" data-suffix="+" style="font-family:'Instrument Serif',serif; font-size:40px; color:var(--accent)">60+</span>
+            <span style="font-size:13px; color:rgba(242,234,217,.55)">gatime në menu</span>
+          </div>
+        </div>
+      </div>
+      <div data-reveal-img="1" style="border-radius:20px; overflow:hidden; aspect-ratio:4/5; box-shadow:0 30px 70px rgba(0,0,0,.5); will-change:transform">
+        <img src="uploads/ambienti.webp" alt="Ambienti i Piceri Vrapit" style="width:100%; height:100%; object-fit:cover; will-change:transform">
+      </div>
+    </div>
+  </section>
+
+  <!-- pizza showcase: spinning pizza swap on scroll -->
+  <section id="showcase" data-screen-label="Pizza Showcase" style="position:relative; z-index:2; min-height:100vh; background:#0D0C0A; display:grid; place-items:center; padding:14vh 0 12vh; box-sizing:border-box">
+    <div style="display:flex; align-items:center; gap:clamp(30px,6vw,90px); padding:0 32px; max-width:1150px; width:100%; justify-content:center">
+      <div style="position:relative; flex:1; max-width:420px; min-height:min(300px,46vh)">
+        <div data-pzcap="0" style="position:absolute; inset:0; display:flex; flex-direction:column; gap:14px; justify-content:center; will-change:transform,opacity">
+          <span style="font-size:11px; letter-spacing:.4em; font-weight:600; color:rgba(242,234,217,.45)">01 / 04</span>
+          <h3 style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(34px,3.8vw,52px); line-height:1.05">Pizza <em style="font-style:italic; color:var(--accent)">Margarita</em></h3>
+          <p style="margin:0; font-size:16px; font-weight:300; line-height:1.7; color:rgba(242,234,217,.7)">Klasikja e përjetshme — salcë domatesh, mocarela e shkrirë dhe buzë e pjekur në flakë.</p>
+        </div>
+        <div data-pzcap="1" style="position:absolute; inset:0; display:flex; flex-direction:column; gap:14px; justify-content:center; opacity:0; will-change:transform,opacity">
+          <span style="font-size:11px; letter-spacing:.4em; font-weight:600; color:rgba(242,234,217,.45)">02 / 04</span>
+          <h3 style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(34px,3.8vw,52px); line-height:1.05">Pizza <em style="font-style:italic; color:var(--accent)">Pikante</em></h3>
+          <p style="margin:0; font-size:16px; font-weight:300; line-height:1.7; color:rgba(242,234,217,.7)">Suxhuk pikant dhe speca të freskët — për ata që e duan me pak zjarr.</p>
+        </div>
+        <div data-pzcap="2" style="position:absolute; inset:0; display:flex; flex-direction:column; gap:14px; justify-content:center; opacity:0; will-change:transform,opacity">
+          <span style="font-size:11px; letter-spacing:.4em; font-weight:600; color:rgba(242,234,217,.45)">03 / 04</span>
+          <h3 style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(34px,3.8vw,52px); line-height:1.05">Pizza <em style="font-style:italic; color:var(--accent)">La Crema</em></h3>
+          <p style="margin:0; font-size:16px; font-weight:300; line-height:1.7; color:rgba(242,234,217,.7)">Pana e butë, proshutë dhe kërpudha — kremoze deri në kafshatën e fundit.</p>
+        </div>
+        <div data-pzcap="3" style="position:absolute; inset:0; display:flex; flex-direction:column; gap:14px; justify-content:center; opacity:0; will-change:transform,opacity">
+          <span style="font-size:11px; letter-spacing:.4em; font-weight:600; color:rgba(242,234,217,.45)">04 / 04</span>
+          <h3 style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(34px,3.8vw,52px); line-height:1.05">Pizza <em style="font-style:italic; color:var(--accent)">4 Stinët</em></h3>
+          <p style="margin:0; font-size:16px; font-weight:300; line-height:1.7; color:rgba(242,234,217,.7)">Katër shije në një pizza — kërpudha, sallam, ullinj dhe ton. Diçka për këdo.</p>
+        </div>
+      </div>
+      <div id="vrapi-pizza-wheel" style="position:relative; width:min(54vh,64vw); aspect-ratio:1/1; border-radius:50%; overflow:hidden; flex-shrink:0; will-change:transform">
+        <img data-pz="0" src="uploads/margarita.jpeg" alt="Pizza Margarita" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+        <img data-pz="1" src="uploads/pikante.png" alt="Pizza Pikante" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0">
+        <img data-pz="2" src="uploads/pizza-la-crema.jpeg" alt="Pizza La Crema" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0">
+        <img data-pz="3" src="uploads/4stinet.png" alt="Pizza 4 Stinët" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0">
+      </div>
+    </div>
+    <div style="position:absolute; top:8vh; left:0; right:0; text-align:center; pointer-events:none">
+       <h3 style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; letter-spacing:.4em; font-size:clamp(34px,3.8vw,52px); line-height:1.05">OUR TASTY<em style="font-style:italic; color:var(--accent)"> PIZZA'S</em></h3>
+    </div>  
+    <a id="vrapi-showcase-arrow" href="#menu-open" onClick="{{ navTo }}" aria-label="Shko te menuja" style="position:absolute; bottom:1vh; left:56%; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; will-change:transform" style-hover="color:#E23B2E">
+      <span style="font-size:10px; letter-spacing:.4em; font-weight:600; color:rgba(242,234,217,.55)">SHIKO MENUNË</span>
+      <svg width="110" height="150" viewBox="0 0 110 150" fill="none" style="overflow:visible">
+        <path id="vrapi-arrow-path" d="M 92 6 C 30 28, 10 66, 28 100 C 38 119, 52 130, 60 138" stroke="#E23B2E" stroke-width="2.5" stroke-linecap="round" fill="none"></path>
+        <path id="vrapi-arrow-head" d="M 44 128 L 61 139 L 64 120" stroke="#E23B2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      </svg>
+    </a>
+  </section>
+
+  <!-- interactive 3D flip-book menu -->
+  <section id="menu-open" data-screen-label="Menu Opening" style="position:relative; z-index:2; min-height:100vh; overflow:hidden; background:radial-gradient(ellipse at 50% 62%, #261711 0%, #14100C 55%, #0D0C0A 100%); display:grid; place-items:center; padding:110px 20px 70px; box-sizing:border-box">
+    <div id="vrapi-book-wrap" style="display:flex; flex-direction:column; align-items:center; gap:24px; width:100%; will-change:transform">
+      <h2 style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,5vw,64px); line-height:1.05; text-align:center">Menuja jonë</h2>
+      <div id="vrapi-flip-row">
+        <button id="vrapi-prev" onClick="{{ prevPage }}" aria-label="Faqja e mëparshme" style="flex:0 0 auto; width:48px; height:48px; border-radius:50%; border:1px solid rgba(242,234,217,.3); background:rgba(13,12,10,.5); color:#F2EAD9; font-size:22px; cursor:pointer; line-height:1" style-hover="border-color:#E23B2E; color:#E23B2E">‹</button>
+        <div id="vrapi-flipbook" onPointerDown="{{ ptrDown }}" onPointerUp="{{ ptrUp }}" style="position:relative; height:min(70vh,50vw); aspect-ratio:2340/1560; perspective:2600px; touch-action:pan-y; user-select:none; -webkit-user-select:none; will-change:transform">
+          <div aria-hidden="true" style="position:absolute; left:4%; right:4%; bottom:-5%; height:9%; background:rgba(0,0,0,.5); filter:blur(24px); border-radius:50%"></div>
+          <!-- sheet 0: branded cover / inside cover -->
+          <div data-sheet="0" style="position:absolute; left:50%; top:0; width:50%; height:100%; transform-origin:left center; transform-style:preserve-3d; will-change:transform; z-index:10">
+            <div data-face="front" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:translateZ(.5px); border-radius:0 12px 12px 0; overflow:hidden; cursor:pointer; background:linear-gradient(135deg, #4A2317 0%, #2B120B 60%, #1D0C07 100%); border:1px solid rgba(217,154,43,.35); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:20px; box-sizing:border-box">
+              <div style="position:absolute; inset:12px; border:1px solid rgba(217,154,43,.45); border-radius:8px; pointer-events:none"></div>
+              <img src="uploads/logo.jpg" alt="" draggable="false" style="width:clamp(56px,7vw,88px); height:clamp(56px,7vw,88px); border-radius:50%; object-fit:cover; border:2px solid rgba(217,154,43,.6)">
+              <div style="font-family:'Instrument Serif',serif; font-size:clamp(18px,2.4vw,30px); letter-spacing:.14em; color:#EFD9A7">PICERI VRAPI</div>
+              <div style="font-size:11px; letter-spacing:.5em; font-weight:600; color:rgba(239,217,167,.7)">MENU</div>
+              <div style="width:46px; height:1px; background:rgba(217,154,43,.5)"></div>
+              <div style="font-size:9px; letter-spacing:.3em; color:rgba(239,217,167,.45)">PIZZA • HALLALL • QË NGA 2014</div>
+            </div>
+            <div data-face="back" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:rotateY(180deg) translateZ(.5px); border-radius:12px 0 0 12px; overflow:hidden; background:linear-gradient(105deg, #F3EBD8, #E7DCC2); box-shadow:inset 0 0 60px rgba(0,0,0,.14); display:grid; place-items:center">
+              <img src="uploads/logo.jpg" alt="" draggable="false" style="width:clamp(70px,9vw,120px); height:clamp(70px,9vw,120px); border-radius:50%; object-fit:cover; opacity:.13; filter:grayscale(60%)">
+            </div>
+          </div>
+          <!-- sheet 1: menu pages 1 | 2 -->
+          <div data-sheet="1" style="position:absolute; left:50%; top:0; width:50%; height:100%; transform-origin:left center; transform-style:preserve-3d; will-change:transform; z-index:9">
+            <div data-face="front" data-page="0" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:translateZ(.5px); border-radius:0 12px 12px 0; overflow:hidden; background:#F3EBD8">
+              <img src="uploads/menu1.jpg" alt="Menu faqja 1" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(0,0,0,.22), transparent 9%)"></div>
+            </div>
+            <div data-face="back" data-page="1" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:rotateY(180deg) translateZ(.5px); border-radius:12px 0 0 12px; overflow:hidden; background:#F3EBD8">
+              <img src="uploads/menu2.jpg" alt="Menu faqja 2" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(270deg, rgba(0,0,0,.22), transparent 9%)"></div>
+            </div>
+          </div>
+          <!-- sheet 2: menu pages 3 | 4 -->
+          <div data-sheet="2" style="position:absolute; left:50%; top:0; width:50%; height:100%; transform-origin:left center; transform-style:preserve-3d; will-change:transform; z-index:8">
+            <div data-face="front" data-page="2" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:translateZ(.5px); border-radius:0 12px 12px 0; overflow:hidden; background:#F3EBD8">
+              <img src="uploads/menu3.jpg" alt="Menu faqja 3" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(0,0,0,.22), transparent 9%)"></div>
+            </div>
+            <div data-face="back" data-page="3" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:rotateY(180deg) translateZ(.5px); border-radius:12px 0 0 12px; overflow:hidden; background:#F3EBD8">
+              <img src="uploads/menu4.jpg" alt="Menu faqja 4" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(270deg, rgba(0,0,0,.22), transparent 9%)"></div>
+            </div>
+          </div>
+          <!-- sheet 3: menu pages 5 | 6 -->
+          <div data-sheet="3" style="position:absolute; left:50%; top:0; width:50%; height:100%; transform-origin:left center; transform-style:preserve-3d; will-change:transform; z-index:7">
+            <div data-face="front" data-page="4" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:translateZ(.5px); border-radius:0 12px 12px 0; overflow:hidden; background:#F3EBD8">
+              <img src="uploads/menu5.jpg" alt="Menu faqja 5" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(0,0,0,.22), transparent 9%)"></div>
+            </div>
+            <div data-face="back" data-page="5" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:rotateY(180deg) translateZ(.5px); border-radius:12px 0 0 12px; overflow:hidden; background:#F3EBD8">
+              <img src="uploads/menu6.jpg" alt="Menu faqja 6" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(270deg, rgba(0,0,0,.22), transparent 9%)"></div>
+            </div>
+          </div>
+          <!-- sheet 4: menu page 7 | back cover -->
+          <div data-sheet="4" style="position:absolute; left:50%; top:0; width:50%; height:100%; transform-origin:left center; transform-style:preserve-3d; will-change:transform; z-index:6">
+            <div data-face="front" data-page="6" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:translateZ(.5px); border-radius:0 12px 12px 0; overflow:hidden; background:#F3EBD8">
+              <img src="uploads/menu7.jpg" alt="Menu faqja 7" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover">
+              <div aria-hidden="true" style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(0,0,0,.22), transparent 9%)"></div>
+            </div>
+            <div data-face="back" style="position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:rotateY(180deg) translateZ(.5px); border-radius:12px 0 0 12px; overflow:hidden; background:linear-gradient(225deg, #4A2317 0%, #2B120B 60%, #1D0C07 100%); border:1px solid rgba(217,154,43,.35); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; padding:20px; box-sizing:border-box">
+              <div style="position:absolute; inset:12px; border:1px solid rgba(217,154,43,.45); border-radius:8px; pointer-events:none"></div>
+              <img src="uploads/logo.jpg" alt="" draggable="false" style="width:clamp(48px,6vw,72px); height:clamp(48px,6vw,72px); border-radius:50%; object-fit:cover; border:2px solid rgba(217,154,43,.6)">
+              <div style="font-family:'Instrument Serif',serif; font-size:clamp(15px,1.8vw,24px); letter-spacing:.14em; color:#EFD9A7">JU FALEMINDERIT</div>
+              <div style="font-size:9px; letter-spacing:.3em; color:rgba(239,217,167,.5)">PICERI VRAPI • TIRANË</div>
+            </div>
+          </div>
+        </div>
+        <button id="vrapi-next" onClick="{{ nextPage }}" aria-label="Faqja tjetër" style="flex:0 0 auto; width:48px; height:48px; border-radius:50%; border:1px solid rgba(242,234,217,.3); background:rgba(13,12,10,.5); color:#F2EAD9; font-size:22px; cursor:pointer; line-height:1" style-hover="border-color:#E23B2E; color:#E23B2E">›</button>
+      </div>
+      <div class="vrapi-cap" style="display:flex; align-items:center; justify-content:center; gap:18px; flex-wrap:wrap; text-align:center; font-size:11px; letter-spacing:.3em; font-weight:600; padding:0 12px">
+        <span>‹ RRËSHQITNI OSE KLIKONI SHIGJETAT ›</span>
+        <span class="acc">{{ pageLabel }}</span>
+        <span>PREKNI NJË GATIM PËR DETAJE</span>
+      </div>
+    </div>
+
+    <!-- item detail popup -->
+    <sc-if value="{{ sel }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeSel }}" style="position:absolute; inset:0; z-index:20; background:rgba(13,12,10,.65); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px); display:grid; place-items:center">
+        <div id="vrapi-popup" onClick="{{ eatClick }}" style="position:relative; width:min(400px,84vw); background:#F8F2E4; color:#1A1712; border:3px solid #E88A1A; border-radius:18px; padding:14px 14px 24px; box-shadow:0 40px 90px rgba(0,0,0,.6); display:flex; flex-direction:column; gap:12px; text-align:center; will-change:transform">
+          <button onClick="{{ closeSel }}" aria-label="Mbyll" style="position:absolute; top:-14px; right:-14px; width:40px; height:40px; border-radius:10px; background:#E23B2E; color:#fff; border:2px solid #fff; font-size:17px; font-weight:800; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.45)" style-hover="background:#c22e22; color:#fff">✕</button>
+          <div sc-camel-style="{{ selImgStyle }}"></div>
+          <div style="font-weight:800; font-size:23px; letter-spacing:.05em; text-transform:uppercase; line-height:1.15">{{ sel.n }}</div>
+          <div style="font-size:14px; line-height:1.5; color:rgba(26,23,18,.62); max-width:320px; margin:0 auto">{{ sel.d }}</div>
+          <div style="width:56px; height:2px; background:#E88A1A; margin:0 auto"></div>
+          <div style="font-weight:800; font-size:27px; color:#E88A1A; letter-spacing:.03em">{{ sel.p }}</div>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+
+  <!-- gallery: infinite cover flow -->
+  <section id="gallery" data-screen-label="Gallery" style="position:relative; z-index:1; min-height:100vh; border-top:1px solid rgba(242,234,217,.07); overflow:hidden; display:flex; flex-direction:column; box-sizing:border-box; padding:90px 0 50px">
+    <div style="display:flex; flex-direction:column; gap:16px; align-items:center; text-align:center; padding:0 32px">
+      <div style="font-size:12px; letter-spacing:.4em; font-weight:600; color:var(--accent)">GALLERY</div>
+      <h2 data-split="1" style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,5vw,64px); line-height:1.05">Nga furra jonë</h2>
+    </div>
+    <div id="vrapi-cf-stage" style="position:relative; flex:1; min-height:52vh; perspective:800px; transform-style:preserve-3d; touch-action:pan-y; cursor:grab; user-select:none">
+      <div data-cf="1" style="position:absolute; top:44%; left:50%; width:clamp(190px,24vmin,290px); aspect-ratio:3/4; background:#1A1712; opacity:0; transform-style:preserve-3d; will-change:transform; -webkit-box-reflect:below 0.5vmin linear-gradient(transparent 0 55%, rgba(255,255,255,.55) 100%)"><img src="uploads/gal-1.webp" alt="Pjatë me krahë pule" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover"></div>
+      <div data-cf="1" style="position:absolute; top:44%; left:50%; width:clamp(190px,24vmin,290px); aspect-ratio:3/4; background:#1A1712; opacity:0; transform-style:preserve-3d; will-change:transform; -webkit-box-reflect:below 0.5vmin linear-gradient(transparent 0 55%, rgba(255,255,255,.55) 100%)"><img src="uploads/gal-2.webp" alt="Pjatë gjiro" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover"></div>
+      <div data-cf="1" style="position:absolute; top:44%; left:50%; width:clamp(190px,24vmin,290px); aspect-ratio:3/4; background:#1A1712; opacity:0; transform-style:preserve-3d; will-change:transform; -webkit-box-reflect:below 0.5vmin linear-gradient(transparent 0 55%, rgba(255,255,255,.55) 100%)"><img src="uploads/gal-3.webp" alt="Burger me patate" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover"></div>
+      <div data-cf="1" style="position:absolute; top:44%; left:50%; width:clamp(190px,24vmin,290px); aspect-ratio:3/4; background:#1A1712; opacity:0; transform-style:preserve-3d; will-change:transform; -webkit-box-reflect:below 0.5vmin linear-gradient(transparent 0 55%, rgba(255,255,255,.55) 100%)"><img src="uploads/gal-4.webp" alt="Chicken burger" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover"></div>
+      <div data-cf="1" style="position:absolute; top:44%; left:50%; width:clamp(190px,24vmin,290px); aspect-ratio:3/4; background:#1A1712; opacity:0; transform-style:preserve-3d; will-change:transform; -webkit-box-reflect:below 0.5vmin linear-gradient(transparent 0 55%, rgba(255,255,255,.55) 100%)"><img src="uploads/gal-5.webp" alt="Pizza vegjetariane" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover"></div>
+      <div data-cf="1" style="position:absolute; top:44%; left:50%; width:clamp(190px,24vmin,290px); aspect-ratio:3/4; background:#1A1712; opacity:0; transform-style:preserve-3d; will-change:transform; -webkit-box-reflect:below 0.5vmin linear-gradient(transparent 0 55%, rgba(255,255,255,.55) 100%)"><img src="uploads/gal-6.webp" alt="Pizza sallam" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover"></div>
+      <div data-cf="1" style="position:absolute; top:44%; left:50%; width:clamp(190px,24vmin,290px); aspect-ratio:3/4; background:#1A1712; opacity:0; transform-style:preserve-3d; will-change:transform; -webkit-box-reflect:below 0.5vmin linear-gradient(transparent 0 55%, rgba(255,255,255,.55) 100%)"><img src="uploads/gal-7.webp" alt="Furra me dru" draggable="false" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover"></div>
+    </div>
+    <div style="display:flex; gap:22px; justify-content:center; align-items:center; padding-top:8px">
+      <button onClick="{{ cfPrev }}" aria-label="Foto e mëparshme" style="width:48px; height:48px; border-radius:50%; border:1px solid rgba(242,234,217,.3); background:rgba(13,12,10,.5); color:#F2EAD9; font-size:22px; cursor:pointer; line-height:1" style-hover="border-color:#E23B2E; color:#E23B2E">‹</button>
+      <span style="font-size:10px; letter-spacing:.4em; font-weight:600; color:rgba(242,234,217,.45)">LËVIZNI • TËRHIQNI • KLIKONI</span>
+      <button onClick="{{ cfNext }}" aria-label="Foto tjetër" style="width:48px; height:48px; border-radius:50%; border:1px solid rgba(242,234,217,.3); background:rgba(13,12,10,.5); color:#F2EAD9; font-size:22px; cursor:pointer; line-height:1" style-hover="border-color:#E23B2E; color:#E23B2E">›</button>
+    </div>
+  </section>
+
+  <!-- reviews -->
+  <section id="reviews" data-screen-label="Reviews" style="position:relative; z-index:1; padding:130px 32px; border-top:1px solid rgba(242,234,217,.07)">
+    <div style="max-width:1150px; margin:0 auto; display:flex; flex-direction:column; gap:44px">
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center; text-align:center">
+        <div style="font-size:12px; letter-spacing:.4em; font-weight:600; color:var(--accent)">REVIEWS</div>
+        <h2 data-split="1" style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px,5vw,64px); line-height:1.05">Çfarë thonë klientët</h2>
+      </div>
+      <div id="vrapi-rev-slider" style="position:relative; max-width:820px; margin:0 auto; width:100%">
+        <div style="overflow:hidden; border-radius:20px; border:1px solid rgba(28,23,18,.1); background:#FAF4E8">
+          <div id="vrapi-rev-track" style="display:flex">
+            <sc-for list="{{ reviews }}" as="rv" hint-placeholder-count="5">
+              <figure class="vr-rev-slide" style="margin:0; box-sizing:border-box; padding:clamp(32px,4vw,52px); display:flex; flex-direction:column; align-items:center; text-align:center; gap:18px">
+                <div class="vr-rev-stars" style="color:var(--accent); font-size:18px; letter-spacing:5px">★★★★★</div>
+                <blockquote class="vr-rev-quote" style="margin:0; font-family:'Instrument Serif',serif; font-size:clamp(19px,2.4vw,27px); line-height:1.5; font-style:italic; max-width:640px">"{{ rv.quote }}"</blockquote>
+                <figcaption class="vr-rev-name" style="font-size:14px; font-weight:600; letter-spacing:.06em">— {{ rv.name }}</figcaption>
+              </figure>
+            </sc-for>
+          </div>
+        </div>
+        <button id="vrapi-rev-prev" onClick="{{ revPrev }}" class="vr-rev-arrow" aria-label="Vlerësimi i mëparshëm">‹</button>
+        <button id="vrapi-rev-next" onClick="{{ revNext }}" class="vr-rev-arrow" aria-label="Vlerësimi tjetër">›</button>
+        <div id="vrapi-rev-dots" class="vr-rev-dots">
+          <sc-for list="{{ reviews }}" as="rv" hint-placeholder-count="5">
+            <button class="vr-rev-dot" aria-label="Shko te vlerësimi"></button>
+          </sc-for>
+        </div>
+        <div style="text-align:center">
+          <a class="vr-rev-cta" href="https://www.google.com/maps?cid=13659342507174827606" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex:0 0 auto"><path fill="currentColor" d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.784 1.401 8.169L12 18.897l-7.335 3.856 1.401-8.169L.132 9.21l8.2-1.192z"></path></svg>
+            Lini një vlerësim në Google
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- location -->
+  <section id="location" data-screen-label="Location" style="position:relative; z-index:1; padding:130px 32px 100px; border-top:1px solid rgba(242,234,217,.07)">
+    <div style="max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center">
+      <div style="display:flex; flex-direction:column; gap:22px">
+        <div style="font-size:12px; letter-spacing:.4em; font-weight:600; color:var(--accent)">LOCATION</div>
+        <h2 data-split="1" style="margin:0; font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(36px,4.5vw,56px); line-height:1.08">Na gjeni në Tiranë</h2>
+        <div style="display:flex; flex-direction:column; gap:18px; font-size:16px; font-weight:300; line-height:1.6; color:rgba(242,234,217,.75)">
+          <div style="display:flex; flex-direction:column; gap:4px">
+            <span style="font-size:11px; letter-spacing:.3em; font-weight:600; color:rgba(242,234,217,.45)">ADRESA</span>
+            Rruga Besim Alla, përballë Helios,<br>pranë pallateve Çabej, Tiranë
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px">
+            <span style="font-size:11px; letter-spacing:.3em; font-weight:600; color:rgba(242,234,217,.45)">TELEFON</span>
+            <a href="tel:+355699191821" style="color:var(--accent)">069 919 1821</a>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px">
+            <span style="font-size:11px; letter-spacing:.3em; font-weight:600; color:rgba(242,234,217,.45)">POROSIT</span>
+            Merr me vete ose porosit me telefon — të nxehtë, drejt në derë.
+          </div>
+        </div>
+      </div>
+      <div data-reveal-img="1" style="border-radius:20px; overflow:hidden; aspect-ratio:1/1; box-shadow:0 30px 70px rgba(0,0,0,.5); will-change:transform">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d749.1389312605711!2d19.77371571677821!3d41.318527640297155!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x135030311c082f1b%3A0xbd8fbba3d58c9656!2sTE_VRAPI_Pizza_Fast_Food_Hallall!5e0!3m2!1sen!2s!4v1784242715043!5m2!1sen!2s" width="100%" height="100%" style="border:0; display:block; width:100%; height:100%" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="Harta e Piceri Vrapi"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- premium footer -->
+  <footer id="vrapi-footer" style="position:relative; z-index:1; padding:clamp(50px,7vw,80px) 32px 0; box-sizing:border-box">
+    <div class="vr-grid">
+      <!-- brand column -->
+      <div style="display:flex; flex-direction:column; gap:20px">
+        <div style="display:flex; align-items:center; gap:14px">
+          <span style="display:grid; place-items:center; width:50px; height:50px; border-radius:50%; background:#fff; overflow:hidden; flex:0 0 auto; border:1px solid rgba(255,255,255,.15)">
+            <img src="uploads/logo.jpg" alt="Piceri Vrapi" style="width:100%; height:100%; object-fit:cover">
+          </span>
+          <span class="vr-brand">PICERI VRAPI</span>
+        </div>
+        <p style="margin:0; line-height:1.75; font-size:15px; max-width:360px; font-weight:300">Pizza · Fast Food · Hallall. Serving in Kombinat, Tirana with fresh food and warm hospitality since 2014.</p>
+        <div style="display:flex; gap:12px">
+          <a class="vr-soc vr-ig" href="https://www.instagram.com/pizza_fast_food_vrapi_hallall/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a class="vr-soc vr-fb" href="https://www.facebook.com/PiceriFastFoodVrapiHallall/" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a class="vr-soc vr-wa" href="https://wa.me/355699191821" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+        </div>
+      </div>
+      <!-- explore column -->
+      <div>
+        <h4>Explore</h4>
+        <nav style="display:flex; flex-direction:column; gap:13px; align-items:flex-start">
+          <a href="#about">About</a>
+          <a href="#menu-open">Menu</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#location">Location</a>
+        </nav>
+      </div>
+      <!-- contact column -->
+      <div>
+        <h4>Contact</h4>
+        <div style="display:flex; flex-direction:column; gap:13px; align-items:flex-start">
+          <a href="tel:+355699191821">069 919 1821</a>
+          <span class="vr-mut">Rruga Besim Alla</span>
+          <span class="vr-mut">Kombinat, Tiranë</span>
+          <span class="vr-mut">Open until 11 PM</span>
+          <span class="vr-gold">Cash · ALL 100–500</span>
+        </div>
+      </div>
+    </div>
+    <div class="vr-bar">
+      <span>© 2026 TE VRAPI Pizza Fast Food Hallall</span>
+      <div class="vr-legal-links">
+        <a onClick="{{ openPrivacy }}">Politika e Privatësisë</a>
+        <a onClick="{{ openCookies }}">Politika e Cookies</a>
+      </div>
+      <span>Kombinat · Tiranë · Albania</span>
+    </div>
+  </footer>
+
+  <!-- privacy / cookies modal -->
+  <sc-if value="{{ legal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLegal }}" class="vr-legal-overlay">
+      <div onClick="{{ eatClick }}" class="vr-legal-modal">
+        <button onClick="{{ closeLegal }}" class="vr-legal-close" aria-label="Mbyll">✕</button>
+        <h3>{{ legalDoc.title }}</h3>
+        <div class="vr-legal-updated">{{ legalDoc.updated }}</div>
+        <sc-for list="{{ legalDoc.sections }}" as="sec" hint-placeholder-count="0">
+          <div class="vr-legal-sec">
+            <h4>{{ sec.h }}</h4>
+            <p>{{ sec.p }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- cookie consent banner -->
+  <sc-if value="{{ showCookie }}" hint-placeholder-val="{{ false }}">
+    <div class="vr-cookie">
+      <span>Kjo faqe përdor cookies për funksionim dhe për hartën e Google. Duke vazhduar, ju pranoni përdorimin e tyre.</span>
+      <div style="display:flex; align-items:center; gap:16px">
+        <a onClick="{{ openCookies }}">Mëso më shumë</a>
+        <button onClick="{{ acceptCookies }}">Pranoj</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#E23B2E&quot;,&quot;options&quot;:[&quot;#E23B2E&quot;,&quot;#D99A2B&quot;,&quot;#4E7A46&quot;,&quot;#8C2B22&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Style&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;}}">
+class Component extends DCLogic {
+  state = { cat: 'Të gjitha', page: 0, sel: null, legal: null, cookieOK: true };
+  A = 1170 / 1560; // menu page aspect
+  // h: hotspot rect [x0,y0,x1,y1] as fractions of the page; r: photo crop rect for the popup (falls back to page fb)
+  PAGES = [
+    { src: 'uploads/menu1.jpg', cat: 'FAST FOOD', fb: [0, .66, 1, 1], items: [
+      { n: 'Sufllaqe Mish Pule', d: 'xaxiq, domate, qepë, mish pule, patate', p: '250 L', h: [.03, .085, .97, .16] },
+      { n: 'Sufllaqe me Wudi', d: 'majonez, domate, wudi, patate', p: '250 L', h: [.03, .16, .97, .24] },
+      { n: 'Sufllaqe Vegjetariane', d: 'xaxiq, domate, qepë, patate', p: '250 L', h: [.03, .24, .97, .32] },
+      { n: 'Doner', d: 'xaxiq, domate, qepë, mish pule, patate', p: '250 L', h: [.03, .32, .97, .40] },
+      { n: 'Doner Brumë Pice', d: 'xaxiq, domate, qepë, mish pule, patate', p: '280 L', h: [.03, .40, .97, .475] },
+      { n: 'Hot Dog', d: 'majonez, domate, wudi, patate', p: '250 L', h: [.03, .475, .97, .55] },
+      { n: 'Tost', d: 'majonez, proshutë, djathë guda, patate', p: '170 L', h: [.03, .55, .97, .63] }
+    ]},
+    { src: 'uploads/menu2.jpg', cat: 'FAST FOOD', fb: [.07, .09, .49, .29], items: [
+      { n: 'Gjiro e Hapur', d: 'pite, xaxiq, mish pule, domate, qepë, patate', p: '450 L', h: [.06, .08, .49, .30], r: [.12, .09, .44, .285] },
+      { n: 'Fileto Pule', d: 'pite, xaxiq, fileto pule, gogozhare, patate', p: '500 L', h: [.51, .08, .95, .30], r: [.54, .09, .87, .27] },
+      { n: 'Krahë Pule', d: 'pite, xaxiq, krahë pule, gogozhare, patate', p: '450 L', h: [.06, .31, .49, .53], r: [.08, .315, .47, .46] },
+      { n: 'Qofte Viçi', d: 'pite, xaxiq, dy qofte, gogozhare, patate', p: '400 L', h: [.51, .31, .95, .53], r: [.52, .315, .93, .46] },
+      { n: 'Hamburger', d: 'sos, sallatë jeshile, domate, turshi, qofte, djathë guda, patate', p: '350 L', h: [.06, .545, .49, .765], r: [.14, .555, .47, .715] },
+      { n: 'Americano Burger', d: 'sos, sallatë jeshile, domate, turshi, qofte, proshutë, vezë, djathë guda, patate', p: '400 L', h: [.51, .545, .95, .765], r: [.52, .555, .87, .715] },
+      { n: 'Chicken Burger', d: 'kotoletë, sos, turshi, sallatë jeshile, patate', p: '350 L', h: [.06, .775, .49, .99], r: [.12, .785, .46, .95] },
+      { n: 'Chicken Nugg', d: '7 copë • patate, ketchup', p: '350 L', h: [.51, .775, .95, .99], r: [.55, .785, .93, .95] }
+    ]},
+    { src: 'uploads/menu3.jpg', cat: 'FAST FOOD', fb: [.07, .40, .48, .62], items: [
+      { n: 'Club Sanduiç', d: 'majonez, sallatë jeshile, domate, djathë pice, proshutë, patate', p: '300 L', h: [.06, .09, .49, .375], r: [.07, .10, .48, .285] },
+      { n: 'Club Sanduiç me Fileto Pule', d: 'sos, sallatë jeshile, domate, djathë pice, fileto pule, patate', p: '350 L', h: [.51, .09, .95, .375], r: [.52, .11, .91, .30] },
+      { n: 'Pita Pita', d: 'sos, mish pule, domate, djathë pice, patate', p: '400 L', h: [.06, .39, .49, .665], r: [.07, .40, .48, .62] },
+      { n: 'Mix për 2 Persona', d: '2 pite, xaxiq, krahë pule, fileto pule, qofte, mish pule, wudi, patate', p: '1400 L', h: [.51, .39, .95, .665], r: [.52, .40, .95, .585] },
+      { n: 'Pite', d: 'shoqëruese', p: '30 L', h: [.06, .70, .49, .765] },
+      { n: 'Patate', d: 'shoqëruese', p: '170 L', h: [.06, .765, .49, .835] },
+      { n: 'Xaxiq', d: 'shoqëruese', p: '150 L', h: [.06, .835, .49, .90] },
+      { n: 'Sallatë Extra', d: 'shoqëruese', p: '30 L', h: [.06, .90, .49, .97] },
+      { n: 'Sallatë Greke', d: 'domate, kastravec, ullinj, djathë i bardhë', p: '400 L', h: [.51, .68, .95, .825], r: [.55, .685, .95, .795] },
+      { n: 'Sallatë Jeshile', d: 'sallatë e freskët jeshile me perime', p: '350 L', h: [.51, .825, .95, .97], r: [.52, .83, .91, .955] }
+    ]},
+    { src: 'uploads/menu4.jpg', cat: 'PIZZA', fb: [.02, .72, .66, .975], items: [
+      { n: 'Pizza Margarita', d: 'salcë, djathë pice', p: '300 / 600 L', h: [.03, .085, .97, .155] },
+      { n: 'Pizza Sallam', d: 'salcë, djathë pice, sallam', p: '350 / 650 L', h: [.03, .155, .97, .225] },
+      { n: 'Pizza Proshutë', d: 'salcë, djathë pice, proshutë', p: '400 / 700 L', h: [.03, .225, .97, .30] },
+      { n: 'Pizza Proshutë Sallam', d: 'salcë, djathë pice, proshutë, sallam', p: '400 / 700 L', h: [.03, .30, .97, .37] },
+      { n: 'Pizza Kërpudhë', d: 'salcë, djathë pice, kërpudhë', p: '350 / 650 L', h: [.03, .37, .97, .44] },
+      { n: 'Pizza Vegjetariane', d: 'salcë, djathë pice, kërpudhë, speca, domate, ullinj', p: '400 / 650 L', h: [.03, .44, .97, .51] },
+      { n: 'Pizza Fshati', d: 'salcë, djathë pice, domate, speca, qepë, ullinj, djathë i bardhë', p: '400 / 700 L', h: [.03, .51, .97, .585] },
+      { n: 'Pizza Proshutë Kërpudhë', d: 'salcë, djathë pice, proshutë, kërpudhë', p: '450 / 750 L', h: [.03, .585, .97, .66] },
+      { n: 'Pizza Proshutë Pana', d: 'pana, djathë pice, proshutë', p: '450 / 750 L', h: [.03, .66, .97, .735] }
+    ]},
+    { src: 'uploads/menu5.jpg', cat: 'PIZZA', fb: [0, .77, 1, 1], items: [
+      { n: 'Pizza Pikante', d: 'salcë, djathë pice, sallam, suxhuk pikant', p: '450 / 800 L', h: [.03, .08, .97, .175] },
+      { n: 'Pizza Kapriçoza', d: 'salcë, djathë pice, proshutë, sallam, kërpudhë, speca, ullinj', p: '450 / 800 L', h: [.03, .175, .97, .28] },
+      { n: 'Pizza O Sole Mio', d: 'salcë, djathë pice, proshutë, vezë', p: '450 / 750 L', h: [.03, .28, .97, .35] },
+      { n: 'Pizza Ton', d: 'salcë, djathë pice, ton, ullinj', p: '450 / 800 L', h: [.03, .35, .97, .425] },
+      { n: 'Pizza Ton Proshutë', d: 'salcë, djathë pice, proshutë, ton', p: '500 / 900 L', h: [.03, .425, .97, .495] },
+      { n: 'Pizza Ton Kërpudhë', d: 'salcë, djathë pice, ton, kërpudhë', p: '500 / 900 L', h: [.03, .495, .97, .565] },
+      { n: 'Pizza 4 Djathrat', d: 'salcë, djathë pice, guda, gorgonzola, grana', p: '450 / 750 L', h: [.03, .565, .97, .645] },
+      { n: 'Pizza 4 Djathrat Proshutë ose Suxhuk', d: 'salcë, djathë pice, guda, gorgonzola, grana, suxhuk ose proshutë', p: '500 / 900 L', h: [.03, .645, .97, .76] }
+    ]},
+    { src: 'uploads/menu6.jpg', cat: 'PIZZA', fb: [0, .74, 1, 1], items: [
+      { n: 'Pizza 4 Stinët', d: 'salcë, djathë pice, proshutë, sallam, ullinj, ton, kërpudhë', p: '500 / 800 L', h: [.03, .075, .97, .145] },
+      { n: 'Pizza La Crema', d: 'salcë, pana, djathë pice, proshutë, suxhuk, kërpudhë', p: '550 / 900 L', h: [.03, .145, .97, .21] },
+      { n: 'Pizza Special Mix', d: 'salcë, djathë pice, proshutë, sallam, suxhuk, ton, kërpudhë, speca, domate, ullinj', p: '500 / 1000 L', h: [.03, .21, .97, .29] },
+      { n: 'Pizza Chicken', d: 'salcë, djathë pice, guda, mish pule, patate', p: '500 / 1000 L', h: [.03, .29, .97, .355] },
+      { n: 'Pizza Polina', d: 'salcë, djathë pice, suxhuk, kërpudhë', p: '500 / 850 L', h: [.03, .355, .97, .42] },
+      { n: 'Pizza Topolino', d: 'pana, djathë pice, wudi, patate', p: '450 / 800 L', h: [.03, .42, .97, .485] },
+      { n: 'Pizza Kalabreze', d: 'salcë, djathë pice, suxhuk, kërpudhë, gorgonzola', p: '550 / 950 L', h: [.03, .485, .97, .55] },
+      { n: 'Pizza Napoli', d: 'salcë, djathë pice, kapri, acuge', p: '500 / 1100 L', h: [.03, .55, .97, .615] },
+      { n: 'Pizza Tartuf', d: 'tartuf, djathë pice, kërpudhë, suxhuk', p: '600 / 1100 L', h: [.03, .615, .97, .68] },
+      { n: 'Pizza Vrapi', d: 'salcë, djathë pice, chicken, kërpudhë, pana', p: '600 / 1100 L', h: [.03, .68, .97, .75] }
+    ]},
+    { src: 'uploads/menu7.jpg', cat: 'SANDUIÇ', fb: [.55, .29, .88, .52], items: [
+      { n: 'Sanduiç Normal', d: 'majonez, sallam, domate, speca, ullinj, djathë pice', p: '150 L', h: [.03, .075, .97, .14] },
+      { n: 'Sanduiç Proshutë', d: 'majonez, proshutë, domate, speca, ullinj, djathë pice', p: '170 L', h: [.03, .14, .97, .205] },
+      { n: 'Sanduiç Pikant', d: 'majonez, suxhuk, domate, speca, ullinj, djathë pice', p: '200 L', h: [.03, .205, .97, .27] },
+      { n: 'Sanduiç Vegjetarian', d: 'salcë kosi, domate, speca, ullinj, kërpudhë, djathë pice', p: '180 L', h: [.03, .27, .97, .35] },
+      { n: 'Sanduiç Proshutë Kërpudhë', d: 'majonez, proshutë, kërpudhë, djathë pice', p: '220 L', h: [.03, .35, .97, .425] },
+      { n: 'Sanduiç Special', d: 'majonez, sallam, suxhuk, kërpudhë, domate, speca, ullinj, djathë pice', p: '220 L', h: [.03, .425, .97, .50] },
+      { n: 'Sanduiç me Ton', d: 'majonez, ton, speca, domate, ullinj, djathë pice', p: '220 L', h: [.03, .50, .97, .565] },
+      { n: 'Sanduiç 4 Djathrat', d: 'majonez, gorgonzola, guda, djathë i bardhë, djathë pice', p: '220 L', h: [.03, .565, .97, .65] },
+      { n: 'Sanduiç 4 Djathrat Suxhuk', d: 'majonez, suxhuk, gorgonzola, guda, djathë i bardhë, djathë pice', p: '270 L', h: [.03, .65, .97, .735] },
+      { n: 'Sanduiç Chicken', d: 'majonez, mish pule, domate, ullinj, djathë pice', p: '250 L', h: [.03, .735, .97, .80] },
+      { n: 'Sanduiç Mix', d: 'majonez, sallam, proshutë, suxhuk, kërpudhë, ton, domate, speca, ullinj, djathë pice', p: '270 L', h: [.03, .80, .97, .885] },
+      { n: 'Sanduiç Vrapi', d: 'pana, kërpudhë, mish pule, djathë pice', p: '290 L', h: [.03, .885, .97, .965] }
+    ]}
+  ];
+  // Real Google Maps reviews for TE VRAPI, translated to Albanian (names kept as-is)
+  REVIEWS = [
+    { quote: 'Shërbim i këndshëm dhe një ambient i ngrohtë e relaksues.', name: 'Toni Canko' },
+    { quote: 'Ushqim shumë i shijshëm dhe ia vlen për paratë. Cilësi e shkëlqyer!', name: 'Nakul Regy' },
+    { quote: 'Po pate fat, mund të marrësh edhe një pizza falas 😂 E rekomandoj shumë!', name: 'Albjola Elezi' },
+    { quote: 'Pica ishte e shijshme, me brumë të lehtë dhe përbërës të freskët e cilësorë. Stafi mikpritës e gjithmonë me buzëqeshje, vendi i pastër dhe shërbimi i shpejtë edhe pse plot. Do të kthehem sigurisht!', name: 'Sara' },
+    { quote: 'Sufllaqe të hapura të shijshme! Mish pule cilësor, pite dhe patate të mrekullueshme, edhe salca e xaxiqit e shkëlqyer. Si fast food ishin vërtet të sjellshëm.', name: 'ilda sina' }
+  ];
+  LEGAL = {
+    privacy: {
+      title: 'Politika e Privatësisë',
+      updated: 'Përditësuar së fundmi: 17 Korrik 2026',
+      sections: [
+        { h: '1. Kush jemi ne', p: 'Kjo faqe administrohet nga Piceri Vrapi ("TE VRAPI Pizza Fast Food Hallall"), me adresë Rruga Besim Alla, Kombinat, Tiranë, Shqipëri. Për çdo pyetje lidhur me të dhënat tuaja personale, mund të na kontaktoni në numrin 069 919 1821. Piceri Vrapi vepron si kontrollues i të dhënave personale.' },
+        { h: '2. Baza ligjore', p: 'Përpunimi i të dhënave personale bazohet në Ligjin nr. 9887, datë 10.03.2008 "Për mbrojtjen e të dhënave personale", të ndryshuar, si dhe në aktet e Komisionerit për të Drejtën e Informimit dhe Mbrojtjen e të Dhënave Personale (IDP) të Republikës së Shqipërisë.' },
+        { h: '3. Cilat të dhëna mbledhim', p: 'Faqja jonë është kryesisht informative dhe nuk përmban formular regjistrimi apo pagese online. Ne mund të mbledhim: (a) të dhëna që na i jepni vetë kur bëni porosi me telefon ose na shkruani në rrjetet sociale (emër, numër telefoni, adresë dorëzimi, detaje të porosisë); (b) të dhëna teknike të kufizuara që gjenerohen automatikisht nga shërbimet e palëve të treta të ngulitura në faqe (p.sh. harta e Google). Ne nuk mbledhim të dhëna të kartës bankare — pagesat kryhen me para në dorë.' },
+        { h: '4. Përse i përdorim', p: 'Të dhënat përdoren vetëm për pranimin dhe përmbushjen e porosive, komunikimin me ju, dorëzimin e ushqimit dhe përmirësimin e shërbimit tonë. Ne nuk i përdorim të dhënat tuaja për reklama të automatizuara.' },
+        { h: '5. Ndarja me të tretë', p: 'Ne nuk i shesim dhe nuk ua japim të dhënat tuaja personave të tretë për qëllime tregtare. Të dhëna mund t\'i besohen vetëm personelit tonë ose shërbimeve që përdorim për funksionimin e faqes (p.sh. Google Maps dhe Google Fonts), të cilat kanë politikat e tyre të privatësisë. Të dhënat mund të ndahen me autoritetet vetëm kur kërkohet me ligj.' },
+        { h: '6. Ruajtja e të dhënave', p: 'Të dhënat ruhen vetëm për aq kohë sa është e nevojshme për qëllimin për të cilin janë mbledhur ose sa parashikon legjislacioni në fuqi, dhe më pas fshihen ose anonimizohen.' },
+        { h: '7. Të drejtat tuaja', p: 'Ju keni të drejtë të kërkoni qasje, korrigjim, fshirje ose kufizim të të dhënave tuaja, si dhe të kundërshtoni përpunimin e tyre. Për t\'i ushtruar këto të drejta, na kontaktoni në 069 919 1821. Gjithashtu keni të drejtë të paraqisni ankesë pranë Komisionerit për të Drejtën e Informimit dhe Mbrojtjen e të Dhënave Personale (www.idp.al).' },
+        { h: '8. Siguria', p: 'Ne marrim masa të arsyeshme teknike dhe organizative për të mbrojtur të dhënat tuaja nga qasja, humbja ose keqpërdorimi i paautorizuar.' },
+        { h: '9. Ndryshimet', p: 'Kjo politikë mund të përditësohet herë pas here. Versioni më i fundit publikohet gjithmonë në këtë faqe, së bashku me datën e përditësimit.' }
+      ]
+    },
+    cookies: {
+      title: 'Politika e Cookies',
+      updated: 'Përditësuar së fundmi: 17 Korrik 2026',
+      sections: [
+        { h: '1. Çfarë janë cookies', p: 'Cookies janë skedarë të vegjël teksti që ruhen në pajisjen tuaj kur vizitoni një faqe interneti. Ato ndihmojnë faqen të funksionojë siç duhet dhe të kujtojë disa preferenca.' },
+        { h: '2. Cookies që përdorim', p: 'Faqja jonë nuk përdor cookies të gjurmimit apo të marketingut për qëllimet tona. Megjithatë, disa shërbime të palëve të treta të ngulitura mund të vendosin cookies: Google Maps (harta e vendndodhjes) dhe Google Fonts (shkronjat). Faqja mund të ruajë gjithashtu disa preferenca teknike lokale në shfletuesin tuaj (local storage) për funksionim më të mirë; këto nuk janë të dhëna personale.' },
+        { h: '3. Cookies të palëve të treta', p: 'Kur ngarkohet harta e Google në faqen tonë, Google mund të vendosë cookies sipas politikave të veta. Për më shumë informacion, shihni politikën e privatësisë së Google (policies.google.com/privacy) dhe mënyrën si Google i përdor cookies (policies.google.com/technologies/cookies).' },
+        { h: '4. Si t\'i menaxhoni', p: 'Ju mund t\'i pranoni, bllokoni ose fshini cookies përmes cilësimeve të shfletuesit tuaj. Vini re se bllokimi i disa cookies mund të ndikojë në funksionimin e faqes, për shembull në shfaqjen e hartës.' },
+        { h: '5. Pëlqimi', p: 'Duke vazhduar të përdorni këtë faqe, ju pranoni përdorimin e cookies siç përshkruhet në këtë politikë. Ju mund ta ndryshoni zgjedhjen tuaj në çdo kohë përmes cilësimeve të shfletuesit.' }
+      ]
+    }
+  };
+  cropStyle(src, r) {
+    const [x0, y0, x1, y1] = r, w = x1 - x0, hh = y1 - y0;
+    const px = w < 1 ? (x0 / (1 - w)) * 100 : 0, py = hh < 1 ? (y0 / (1 - hh)) * 100 : 0;
+    return `width:100%; aspect-ratio:${(w / hh) * this.A}; max-height:280px; background-image:url("${src}"); background-size:${100 / w}% ${100 / hh}%; background-position:${px}% ${py}%; border-radius:12px; border:2px solid #E88A1A;`;
+  }
+  renderVals() {
+    const cats = ['Të gjitha', 'PIZZA', 'FAST FOOD', 'SANDUIÇ'];
+    const base = 'cursor:pointer; font-family:Outfit,sans-serif; font-size:13px; font-weight:600; letter-spacing:.1em; padding:11px 22px; border-radius:999px; transition:all .25s ease;';
+    const active = this.state.cat;
+    const all = [];
+    this.PAGES.forEach(pg => pg.items.forEach(it => all.push({ name: it.n, desc: it.d, price: it.p, cat: pg.cat })));
+    const sel = this.state.sel;
+    return {
+      tabs: cats.map(c => ({
+        label: c, pick: () => this.setFilter(c),
+        style: base + (c === active
+          ? ' background:var(--accent); color:#fff; border:1px solid var(--accent);'
+          : ' background:transparent; color:rgba(242,234,217,.6); border:1px solid rgba(242,234,217,.2);')
+      })),
+      items: active === 'Të gjitha' ? all : all.filter(m => m.cat === active),
+      reviews: this.REVIEWS,
+      pageLabel: this._mobile
+        ? `FAQJA ${(this._mi || 0) + 1} / ${this.PAGES.length}`
+        : (['KOPERTINA', 'FAQJA 1 / 7', 'FAQET 2–3 / 7', 'FAQET 4–5 / 7', 'FAQET 6–7 / 7', 'FUNDI I MENUSË'][this.state.page] || ''),
+      sel,
+      selImgStyle: sel ? this.cropStyle(sel.src, sel.r || sel.fb) : '',
+      closeSel: (e) => { e.stopPropagation(); this.setState({ sel: null }); },
+      eatClick: (e) => e.stopPropagation(),
+      legal: this.state.legal,
+      legalDoc: this.state.legal ? this.LEGAL[this.state.legal] : null,
+      openPrivacy: () => this.setState({ legal: 'privacy' }),
+      openCookies: () => this.setState({ legal: 'cookies' }),
+      closeLegal: () => this.setState({ legal: null }),
+      showCookie: !this.state.cookieOK,
+      acceptCookies: () => { try { localStorage.setItem('vrapiCookieOK', '1'); } catch (e) {} this.setState({ cookieOK: true }); },
+      prevPage: () => this.go(-1),
+      nextPage: () => this.go(1),
+      cfPrev: () => this.cfGo(-1),
+      cfNext: () => this.cfGo(1),
+      revPrev: () => this.revGo((this._rev ? this._rev.i : 0) - 1),
+      revNext: () => this.revGo((this._rev ? this._rev.i : 0) + 1),
+      ptrDown: (e) => { this._px = e.clientX; },
+      ptrUp: (e) => {
+        const dx = e.clientX - (this._px ?? e.clientX);
+        if (Math.abs(dx) > 45) {
+          this._swiping = true; // suppress the click that follows a swipe so hotspots don't fire
+          setTimeout(() => { this._swiping = false; }, 250);
+          this.go(dx < 0 ? 1 : -1);
+        }
+      },
+      navTo: (e) => {
+        e.preventDefault();
+        const target = e.currentTarget.getAttribute('href');
+        const lenis = (window.__vrapiAnim && window.__vrapiAnim.lenis) || this.lenis;
+        if (lenis) lenis.scrollTo(target, { offset: -80, duration: 1.4 });
+        else { const el = document.querySelector(target); if (el) window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' }); }
+      }
+    };
+  }
+  cfGo(dir) {
+    const cf = window.__vrapiAnim && window.__vrapiAnim.cf;
+    if (!cf || !cf.render) return;
+    cf.manual += dir * cf.unit;
+    cf.render();
+  }
+  revGo(i) {
+    const r = this._rev;
+    if (!r) return;
+    i = (i + r.n) % r.n;
+    r.i = i;
+    r.track.style.transform = `translateX(-${i * 100}%)`;
+    r.dots.forEach((d, k) => d.classList.toggle('active', k === i));
+    if (this.motionOn && window.gsap && r.slides[i]) {
+      window.gsap.fromTo(r.slides[i].querySelectorAll('.vr-rev-stars, .vr-rev-quote, .vr-rev-name'),
+        { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: .5, stagger: .08, ease: 'power2.out', overwrite: true, clearProps: 'transform,opacity' });
+    }
+    this.revAuto();
+  }
+  revAuto() {
+    clearTimeout(this._revT);
+    this._revT = setTimeout(() => this.revGo(this._rev.i + 1), 5500);
+  }
+  renderMobilePage(i) {
+    const pg = this.PAGES[i];
+    if (!pg || !this._mobPager) return;
+    const { img, hs } = this._mobPager;
+    img.src = pg.src;
+    hs.innerHTML = '';
+    pg.items.forEach(it => {
+      const d = document.createElement('div');
+      d.className = 'vrapi-hs';
+      d.title = it.n;
+      d.style.cssText = `left:${it.h[0] * 100}%; top:${it.h[1] * 100}%; width:${(it.h[2] - it.h[0]) * 100}%; height:${(it.h[3] - it.h[1]) * 100}%;`;
+      d.addEventListener('click', () => { if (!this._swiping) this.setState({ sel: { ...it, src: pg.src, fb: pg.fb } }); });
+      hs.appendChild(d);
+    });
+  }
+  goMobile(dir) {
+    const n = this.PAGES.length;
+    const t = Math.min(n - 1, Math.max(0, (this._mi || 0) + dir));
+    if (t === this._mi) return;
+    this._mi = t;
+    this.setState({ page: t, sel: null });
+    this.renderMobilePage(t);
+    const img = this._mobPager && this._mobPager.img;
+    if (window.gsap && img && this.motionOn) {
+      window.gsap.fromTo(img, { xPercent: dir > 0 ? 12 : -12, opacity: .25 }, { xPercent: 0, opacity: 1, duration: .4, ease: 'power2.out', overwrite: true, clearProps: 'transform,opacity' });
+    }
+  }
+  go(dir) {
+    if (this._mobile) return this.goMobile(dir);
+    const bk = this._book;
+    if (!bk) return;
+    const target = Math.min(bk.sheets.length, Math.max(0, bk.f + dir));
+    if (target === bk.f) return; // clamped at the cover / back cover
+    const idx = dir > 0 ? bk.f : bk.f - 1;
+    const sheet = bk.sheets[idx];
+    bk.f = target;
+    this.setState({ page: target, sel: null });
+    // flipped sheets stack up from the spine (z=idx+1); unflipped stack down (z=10-idx)
+    const endZ = dir > 0 ? idx + 1 : 10 - idx;
+    const endX = target === 0 ? -25 : target === bk.sheets.length ? 25 : 0;
+    const dur = this.motionOn ? 1.1 : 0;
+    if (window.gsap) {
+      sheet.style.zIndex = 30; // keep the turning page above both stacks mid-flip
+      window.gsap.to(sheet, { rotationY: dir > 0 ? -180 : 0, duration: dur, ease: 'power2.inOut', overwrite: 'auto', onComplete: () => { sheet.style.zIndex = endZ; } });
+      window.gsap.to(bk.el, { xPercent: endX, duration: dur, ease: 'power2.inOut', overwrite: 'auto' });
+    } else {
+      sheet.style.transform = `rotateY(${dir > 0 ? -180 : 0}deg)`;
+      sheet.style.zIndex = endZ;
+      bk.el.style.transform = `translateX(${endX}%)`;
+    }
+  }
+  setFilter(c) {
+    this.setState({ cat: c }, () => {
+      if (!this.motionOn || !window.gsap) return;
+      window.gsap.fromTo('#vrapi-grid [data-card]',
+        { y: 40, opacity: 0 },
+        { y: 0, opacity: 1, duration: .6, stagger: .04, ease: 'power3.out', overwrite: true, clearProps: 'opacity,transform' });
+      if (window.ScrollTrigger) window.ScrollTrigger.refresh();
+    });
+  }
+  componentDidMount() {
+    const accent = this.props.accent;
+    if (accent) { const r = document.getElementById('vrapi-root'); if (r) r.style.setProperty('--accent', accent); }
+    // cookie banner: show only if the visitor hasn't accepted before
+    try { if (!localStorage.getItem('vrapiCookieOK')) this.setState({ cookieOK: false }); } catch (e) {}
+    // loading screen: let it play once, then remove it (safety net covers reduced-motion,
+    // where the CSS fade is disabled, and prevents a replay on a later remount)
+    const loader = document.getElementById('vrapi-loader');
+    if (loader) {
+      if (window.__vrapiLoaderDone) loader.style.display = 'none';
+      else setTimeout(() => { loader.style.display = 'none'; window.__vrapiLoaderDone = true; }, 3400);
+    }
+    // mobile menu: close the overlay when a link is tapped (navTo still handles the scroll)
+    const navCb = document.getElementById('vrapi-nav-cb');
+    const mm = document.querySelector('.vr-mobile-menu');
+    if (navCb && mm && !mm.dataset.wired) {
+      mm.dataset.wired = '1';
+      mm.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { navCb.checked = false; }));
+    }
+    // per-mount-cycle token: a stale unmount can't block or kill the live mount's animations
+    let tries = 0;
+    const wait = () => {
+      const root = document.getElementById('vrapi-root');
+      if (!root) return;
+      const slot = window.__vrapiAnim;
+      if (slot && !slot.torndown) {
+        if (slot.root === root) return; // live animations already bound to THIS DOM
+        // stale slot from a replaced DOM tree: tear it down, then re-init below
+        slot.torndown = true;
+        if (slot.ctx) slot.ctx.revert();
+        if (slot.tick && window.gsap) window.gsap.ticker.remove(slot.tick);
+        if (slot.lenis) slot.lenis.destroy();
+        if (window.__vrapiAnim === slot) window.__vrapiAnim = null;
+      }
+      if (window.gsap && window.ScrollTrigger && window.Lenis) this.initAnim();
+      else if (tries++ < 100) setTimeout(wait, 100);
+    };
+    wait();
+  }
+  initAnim() {
+    const gsap = window.gsap;
+    gsap.registerPlugin(window.ScrollTrigger);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.motionOn = (this.props.motion ?? true) && !reduced;
+    // global slot: teardown only ever touches what's registered here
+    const slot = { ctx: null, lenis: null, tick: null, torndown: false, root: document.getElementById('vrapi-root') };
+    window.__vrapiAnim = slot;
+    if (this.motionOn) {
+      this.lenis = slot.lenis = new window.Lenis({ lerp: 0.1 });
+      this.lenis.on('scroll', window.ScrollTrigger.update);
+      this._tick = slot.tick = (t) => this.lenis.raf(t * 1000);
+      gsap.ticker.add(this._tick);
+      gsap.ticker.lagSmoothing(0);
+    }
+    // flip-book: phones get a flat single-page pager (full-res, no 3D blur);
+    // larger screens get the 3D two-page book with clickable dish hotspots
+    const fbk = document.getElementById('vrapi-flipbook');
+    if (fbk && !fbk.dataset.built) {
+      fbk.dataset.built = '1';
+      this._mobile = window.matchMedia('(max-width:640px)').matches;
+      if (this._mobile) {
+        this._mi = 0;
+        const img = document.createElement('img');
+        img.id = 'vrapi-mobile-page'; img.alt = 'Faqe e menusë'; img.draggable = false;
+        img.style.cssText = 'position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#F3EBD8; will-change:opacity';
+        const hs = document.createElement('div');
+        hs.id = 'vrapi-mobile-hs'; hs.style.cssText = 'position:absolute; inset:0';
+        fbk.appendChild(img); fbk.appendChild(hs);
+        this._mobPager = { img, hs };
+        this.renderMobilePage(0);
+      } else {
+        this._book = { el: fbk, sheets: Array.from(fbk.querySelectorAll('[data-sheet]')), f: 0 };
+        fbk.querySelectorAll('[data-page]').forEach(face => {
+          const pg = this.PAGES[+face.dataset.page];
+          if (!pg) return;
+          pg.items.forEach(it => {
+            const d = document.createElement('div');
+            d.className = 'vrapi-hs';
+            d.title = it.n;
+            d.style.cssText = `left:${it.h[0] * 100}%; top:${it.h[1] * 100}%; width:${(it.h[2] - it.h[0]) * 100}%; height:${(it.h[3] - it.h[1]) * 100}%;`;
+            d.addEventListener('click', () => { if (!this._swiping) this.setState({ sel: { ...it, src: pg.src, fb: pg.fb } }); });
+            face.appendChild(d);
+          });
+        });
+        const coverFace = fbk.querySelector('[data-sheet="0"] [data-face="front"]');
+        if (coverFace) coverFace.addEventListener('click', () => { if (this._book.f === 0 && !this._swiping) this.go(1); });
+        gsap.set(fbk, { xPercent: -25 });
+      }
+    }
+    // reviews slider: arrows (DC handlers) + dots + pointer swipe + autoplay
+    const revTrack = document.getElementById('vrapi-rev-track');
+    if (revTrack && !revTrack.dataset.built) {
+      revTrack.dataset.built = '1';
+      const slides = Array.from(revTrack.children);
+      const dots = Array.from(document.querySelectorAll('#vrapi-rev-dots .vr-rev-dot'));
+      revTrack.style.transition = 'transform .55s cubic-bezier(.4,0,.2,1)';
+      this._rev = { track: revTrack, slides, dots, i: 0, n: slides.length };
+      dots.forEach((d, k) => d.addEventListener('click', () => this.revGo(k)));
+      const sw = document.getElementById('vrapi-rev-slider');
+      if (sw) {
+        sw.addEventListener('pointerdown', (e) => { this._revPx = e.clientX; });
+        sw.addEventListener('pointerup', (e) => {
+          const dx = e.clientX - (this._revPx ?? e.clientX);
+          if (Math.abs(dx) > 45) this.revGo(this._rev.i + (dx < 0 ? 1 : -1));
+        });
+      }
+      this.revGo(0);
+    }
+    if (!this.motionOn) {
+      // static gallery fallback: flow the covers as a plain wrapped row
+      const stage = document.getElementById('vrapi-cf-stage');
+      if (stage) {
+        stage.style.cssText += 'display:flex; flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; padding:40px 32px; perspective:none';
+        stage.querySelectorAll('[data-cf]').forEach(b => { b.style.position = 'static'; b.style.opacity = '1'; });
+      }
+      if (this._book) this.go(1); // desktop: open the book to the first page (mobile pager already shows page 0)
+      return;
+    }
+    this.ctx = slot.ctx = gsap.context(() => {
+      // pizza showcase: pinned spin-swap through 4 pizzas
+      const ptl = gsap.timeline({ scrollTrigger: { trigger: '#showcase', start: 'top top', end: '+=2200', pin: true, scrub: 1, anticipatePin: 1 } });
+      for (let i = 1; i <= 3; i++) {
+        const at = (i - 1) * 1.2;
+        ptl.to('#vrapi-pizza-wheel', { rotation: i * 120, duration: 1, ease: 'power1.inOut' }, at)
+          .to(`[data-pz="${i - 1}"]`, { opacity: 0, duration: .4, ease: 'none' }, at + .3)
+          .to(`[data-pz="${i}"]`, { opacity: 1, duration: .4, ease: 'none' }, at + .3)
+          // clean hand-off: the outgoing caption fully clears BEFORE the next enters,
+          // so the two never overlap as ghosted text mid-rotation
+          .to(`[data-pzcap="${i - 1}"]`, { y: -24, opacity: 0, duration: .25, ease: 'power2.in' }, at + .15)
+          .fromTo(`[data-pzcap="${i}"]`, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .3, ease: 'power2.out' }, at + .42);
+      }
+      ptl.to({}, { duration: .5 }); // breathing room on the last pizza
+      // curved arrow: path draws itself as you scroll through the showcase, head pops at the end
+      const apath = document.getElementById('vrapi-arrow-path');
+      if (apath) {
+        const L = apath.getTotalLength();
+        gsap.set(apath, { strokeDasharray: L, strokeDashoffset: L });
+        gsap.set('#vrapi-arrow-head', { opacity: 0, scale: .4, transformOrigin: '55px 130px' });
+        const atl = gsap.timeline({ scrollTrigger: { trigger: '#showcase', start: 'top top', end: '+=2200', scrub: 1 } });
+        atl.to(apath, { strokeDashoffset: 0, duration: .85, ease: 'none' }, 0)
+          .to('#vrapi-arrow-head', { opacity: 1, scale: 1, duration: .15, ease: 'power2.out' }, .85);
+      }
+      gsap.to('#vrapi-showcase-arrow', { y: 8, duration: 1, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      // 3D flip-book: rise in on approach, then the cover flips open on its own the first time
+      gsap.from('#vrapi-book-wrap', {
+        y: 90, opacity: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: '#menu-open', start: 'top 75%' }
+      });
+      window.ScrollTrigger.create({
+        trigger: '#menu-open', start: 'top 45%', once: true,
+        onEnter: () => { if (this._book && this._book.f === 0) this.go(1); }
+      });
+      // split headings into word reveals
+      document.querySelectorAll('[data-split]').forEach(h => {
+        const words = h.textContent.trim().split(/\s+/);
+        h.textContent = '';
+        words.forEach((w, i) => {
+          const outer = document.createElement('span');
+          outer.style.cssText = 'display:inline-block; overflow:hidden; vertical-align:top; padding-bottom:.08em; margin-bottom:-.08em';
+          const inner = document.createElement('span');
+          inner.style.cssText = 'display:inline-block; will-change:transform';
+          inner.textContent = w;
+          outer.appendChild(inner);
+          h.appendChild(outer);
+          if (i < words.length - 1) h.appendChild(document.createTextNode(' '));
+        });
+        gsap.from(h.querySelectorAll('span > span'), {
+          yPercent: 115, rotate: 4, duration: .9, stagger: .06, ease: 'power4.out',
+          scrollTrigger: { trigger: h, start: 'top 85%' }
+        });
+      });
+      // hero entrance
+      const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+      tl.from('#vrapi-nav-inner', { y: -30, opacity: 0, duration: .8 })
+        .from('[data-hero="eyebrow"]', { y: 24, opacity: 0, duration: .7 }, '-=.5')
+        .from('[data-hero="title"] em, [data-hero="title"]', { y: 60, opacity: 0, duration: 1 }, '-=.45')
+        .from('[data-hero="sub"]', { y: 30, opacity: 0, duration: .8 }, '-=.6')
+        .from('[data-hero="cta"]', { y: 24, opacity: 0, duration: .7 }, '-=.55')
+      // gentle slow-motion playback + GPU-composited parallax for smooth video
+      const vid = document.getElementById('vrapi-hero-video');
+      if (vid) {
+        vid.playbackRate = 0.75; vid.style.transform = 'translateZ(0)';
+        vid.loop = true; vid.muted = true;
+        vid.addEventListener('ended', () => { vid.currentTime = 0; vid.play(); }); // belt-and-braces loop
+        vid.play().catch(() => {});
+
+        let heroscrolltl = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#vrapi-hero-video",
+            pin: true, 
+            start: "top top",
+            end: "+=100%", 
+            scrub: 1,
+            snap: {
+              duration: { min: 0.05, max: 0.2 },
+              delay: 0,
+              ease: "power1.inOut", // the ease of the snap animation ("power3" by default)
+            },
+          },
+        });
+
+        heroscrolltl.from('#vrapi-hero-video', {opacity: 1}).to("#vrapi-hero-video", {opacity: 0});
+      }
+      // image reveals
+      document.querySelectorAll('[data-reveal-img]').forEach(box => {
+        gsap.from(box, { clipPath: 'inset(0% 0% 100% 0% round 16px)', duration: 1.1, ease: 'power3.inOut', scrollTrigger: { trigger: box, start: 'top 88%' } });
+        const img = box.querySelector('img');
+        if (img) gsap.from(img, { scale: 1.2, duration: 1.5, ease: 'power2.out', scrollTrigger: { trigger: box, start: 'top 88%' } });
+      });
+      // staggered cards & stats
+      window.ScrollTrigger.batch('[data-card]', {
+        start: 'top 90%',
+        onEnter: (els) => gsap.fromTo(els, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: .7, stagger: .07, ease: 'power3.out', overwrite: true, clearProps: 'opacity,transform' })
+      });
+      gsap.from('[data-stat]', { y: 30, opacity: 0, duration: .7, stagger: .12, ease: 'power3.out', scrollTrigger: { trigger: '[data-stat]', start: 'top 88%' } });
+      // stat count-up
+      document.querySelectorAll('[data-count]').forEach(el => {
+        const target = parseInt(el.dataset.count, 10), suffix = el.dataset.suffix || '';
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v: target, duration: 1.8, ease: 'power2.out',
+          onUpdate: () => { el.textContent = Math.round(obj.v) + suffix; },
+          scrollTrigger: { trigger: el, start: 'top 88%' }
+        });
+      });
+      // section transitions: hero recedes as you leave it; each next section rises into place
+      // recede only the hero CONTENT — never the video or its gradient overlay (scaling those exposed raw video edges)
+      gsap.to('#vrapi-hero-content', { scale: .9, opacity: .15, yPercent: -8, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'center center', end: 'bottom top', scrub: true } });
+  
+      ['#about div', '#gallery div', '#reviews div', '#location div'].forEach(sel => {
+        gsap.fromTo(sel, { y: 90, scale: .965, opacity: .35 }, { y: 0, scale: 1, opacity: 1, ease: 'none', scrollTrigger: { trigger: sel, start: 'top 96%', end: 'top 40%', scrub: true } });
+      });
+      // floating decor: parallax + continuous sway
+      document.querySelectorAll('[data-parallax]').forEach(el => {
+        gsap.to(el, { yPercent: parseFloat(el.dataset.parallax) * 4, ease: 'none', scrollTrigger: { trigger: '#vrapi-root', start: 'top top', end: 'bottom bottom', scrub: 1.2 } });
+        if (el.dataset.sway) gsap.to(el, { x: 'random(-25,25)', rotation: 'random(-6,6)', duration: 'random(5,9)', repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      });
+      // gallery: infinite cover flow (adapted from jh3y), scroll-scrubbed + draggable + buttons
+      const CF = gsap.utils.toArray('[data-cf]');
+      if (CF.length) {
+        const STAGGER = .1, CYCLE = STAGGER * CF.length;
+        gsap.set(CF, { yPercent: -50 });
+        const LOOP = gsap.timeline({ paused: true, repeat: -1, ease: 'none' });
+        [...CF, ...CF, ...CF].forEach((el, index) => {
+          const btl = gsap.timeline()
+            .set(el, { xPercent: 250, rotateY: -50, opacity: 0, scale: .5 })
+            .to(el, { opacity: 1, scale: 1, duration: .1 }, 0)
+            .to(el, { opacity: 0, scale: .5, duration: .1 }, .9)
+            .fromTo(el, { xPercent: 250 }, { xPercent: -350, duration: 1, immediateRender: false, ease: 'power1.inOut' }, 0)
+            .fromTo(el, { rotateY: -50 }, { rotateY: 50, immediateRender: false, duration: 1, ease: 'power4.inOut' }, 0)
+            .to(el, { z: 100, scale: 1.25, duration: .1, repeat: 1, yoyo: true }, .4)
+            .fromTo(el, { zIndex: 1 }, { zIndex: CF.length, repeat: 1, yoyo: true, ease: 'none', duration: .5, immediateRender: false }, 0);
+          LOOP.add(btl, index * STAGGER);
+        });
+        const LOOP_HEAD = gsap.fromTo(LOOP, { totalTime: CYCLE + .5 }, { totalTime: `+=${CYCLE}`, duration: 1, ease: 'none', repeat: -1, paused: true });
+        // Continuous autoplay + manual offset (drag / buttons). Deliberately NOT
+        // pinned to the scroll — the old pinned scrub fought Lenis and could trap
+        // vertical scrolling. Now the page always scrolls; the flow spins on its own
+        // and the user can drag or tap the arrows to steer it.
+        const POS_WRAP = gsap.utils.wrap(0, LOOP_HEAD.duration());
+        const cf = { autoPos: 0, manual: 0, unit: 1 / CF.length };
+        cf.render = () => LOOP_HEAD.totalTime(POS_WRAP(cf.autoPos + cf.manual));
+        cf.auto = gsap.to(cf, { autoPos: '+=100', duration: 22 * 100, ease: 'none', onUpdate: cf.render });
+        this._cf = slot.cf = cf;
+        // drag to spin — pauses autoplay while held; resilient to a lost pointerup
+        const stage = document.getElementById('vrapi-cf-stage');
+        if (stage) {
+          let dragging = false, startX = 0, startManual = 0;
+          const endDrag = () => { if (!dragging) return; dragging = false; stage.style.cursor = 'grab'; cf.auto.resume(); };
+          stage.addEventListener('pointerdown', (e) => { dragging = true; startX = e.pageX; startManual = cf.manual; stage.style.cursor = 'grabbing'; cf.auto.pause(); });
+          window.addEventListener('pointermove', (e) => {
+            if (!dragging) return;
+            // low sensitivity → the flow moves slowly and precisely while you drag
+            cf.manual = startManual + (startX - e.pageX) * .0006;
+            cf.render();
+          });
+          window.addEventListener('pointerup', endDrag);
+          window.addEventListener('pointercancel', endDrag);
+          window.addEventListener('blur', endDrag);
+        }
+      }
+      // navbar blur & shrink
+      const nav = document.getElementById('vrapi-nav');
+      const navInner = document.getElementById('vrapi-nav-inner');
+      window.ScrollTrigger.create({
+        start: 30,
+        onEnter: () => {
+          gsap.to(nav, { backgroundColor: 'rgba(13,12,10,.72)', borderBottomColor: 'rgba(242,234,217,.09)', backdropFilter: 'blur(14px)', duration: .4 });
+          gsap.to(navInner, { paddingTop: 12, paddingBottom: 12, duration: .4 });
+        },
+        onLeaveBack: () => {
+          gsap.to(nav, { backgroundColor: 'rgba(13,12,10,0)', borderBottomColor: 'rgba(242,234,217,0)', backdropFilter: 'blur(0px)', duration: .4 });
+          gsap.to(navInner, { paddingTop: 22, paddingBottom: 22, duration: .4 });
+        }
+      });
+    });
+    const safeRefresh = () => {
+      const r = document.getElementById('vrapi-root');
+      if (r && r.isConnected) window.ScrollTrigger.refresh();
+    };
+    setTimeout(safeRefresh, 600);
+    // watchdog: the host can detach/reattach the DOM after init, which culls every
+    // ScrollTrigger while leaving pin-spacers behind. If that happens, rebuild.
+    [900, 1800, 3000, 5000].forEach(ms => setTimeout(() => {
+      if (window.__vrapiAnim !== slot || slot.torndown) return;
+      const r = document.getElementById('vrapi-root');
+      if (!r || !r.isConnected) return;
+      if (window.ScrollTrigger.getAll().length === 0) {
+        slot.torndown = true;
+        try { if (slot.ctx) slot.ctx.revert(); } catch (e) {}
+        if (slot.tick) gsap.ticker.remove(slot.tick);
+        try { if (slot.lenis) slot.lenis.destroy(); } catch (e) {}
+        window.__vrapiAnim = null;
+        // unwrap any stale pin-spacers so re-pinning doesn't nest them
+        document.querySelectorAll('.pin-spacer').forEach(sp => {
+          const p = sp.parentNode;
+          if (!p) return;
+          while (sp.firstChild) p.insertBefore(sp.firstChild, sp);
+          p.removeChild(sp);
+        });
+        this.initAnim();
+      }
+    }, ms));
+  }
+  componentWillUnmount() {
+    // deferred teardown: only revert if the DC root is truly gone from the DOM; if it still exists, never tear down.
+    setTimeout(() => {
+      const slot = window.__vrapiAnim;
+      if (!slot || slot.torndown) return;
+      const root = document.getElementById('vrapi-root');
+      if (root && slot.root === root) return; // slot still owns the live DOM
+      slot.torndown = true;
+      if (slot.ctx) slot.ctx.revert();
+      if (slot.tick && window.gsap) window.gsap.ticker.remove(slot.tick);
+      if (slot.lenis) slot.lenis.destroy();
+      if (window.__vrapiAnim === slot) window.__vrapiAnim = null;
+    }, 200);
+  }
+}
+</script>
+</body>
+</html>
